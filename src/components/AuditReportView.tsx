@@ -2,27 +2,24 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   Download, 
   Share2, 
   CheckCircle2, 
-  AlertTriangle, 
   XCircle, 
   TrendingUp, 
-  Globe, 
   ArrowUpRight, 
   Search, 
   Zap, 
   MousePointerClick, 
   Layers, 
   Building2, 
-  Calendar,
-  Sparkles,
-  ArrowRight,
-  ShieldCheck,
-  Check,
-  Clock,
-  Loader2
+  Calendar, 
+  Sparkles, 
+  ShieldCheck, 
+  Check, 
+  Loader2 
 } from 'lucide-react';
 import { AuditReport } from '@/types/audit';
 
@@ -32,16 +29,16 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
   const [activeTab, setActiveTab] = useState<'overview' | 'recommendations' | 'roadmap' | 'technical'>('overview');
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-emerald-600 border-emerald-500 bg-emerald-50';
-    if (score >= 60) return 'text-blue-600 border-blue-500 bg-blue-50';
-    if (score >= 45) return 'text-amber-600 border-amber-500 bg-amber-50';
-    return 'text-red-600 border-red-500 bg-red-50';
+    if (score >= 80) return 'text-[#DDF160] border-[#DDF160] bg-[#DDF160]/10';
+    if (score >= 60) return 'text-white border-white/40 bg-white/5';
+    if (score >= 45) return 'text-amber-400 border-amber-400/40 bg-amber-400/10';
+    return 'text-red-400 border-red-400/40 bg-red-400/10';
   };
 
   const getPriorityBadge = (priority: 'High' | 'Medium' | 'Low') => {
-    if (priority === 'High') return 'bg-red-50 text-red-700 border-red-200';
-    if (priority === 'Medium') return 'bg-amber-50 text-amber-700 border-amber-200';
-    return 'bg-blue-50 text-blue-700 border-blue-200';
+    if (priority === 'High') return 'bg-red-500/10 text-red-300 border-red-500/30';
+    if (priority === 'Medium') return 'bg-amber-500/10 text-amber-300 border-amber-500/30';
+    return 'bg-blue-500/10 text-blue-300 border-blue-500/30';
   };
 
   const handleShare = () => {
@@ -65,6 +62,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         scale: 1.5,
         useCORS: true,
         logging: false,
+        backgroundColor: '#161616',
       });
 
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
@@ -101,44 +99,44 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/60 pb-20">
+    <div className="min-h-screen bg-[#161616] text-[#FAF7F6] pb-24">
       {/* Top Banner Action Bar */}
-      <div className="bg-white border-b border-slate-200 sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-[#1C1C1C]/90 border-b border-white/[0.08] sticky top-20 z-40 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs border border-blue-100">
+            <div className="w-9 h-9 rounded-xl bg-[#DDF160] text-[#161616] flex items-center justify-center font-bold text-sm shadow-sm">
               {report.scores.overall}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-bold text-sm text-slate-900">{report.businessName}</h1>
-                <span className="text-xs text-slate-600">•</span>
+                <h1 className="font-display font-bold text-sm text-white">{report.businessName}</h1>
+                <span className="text-xs text-[#737373]">•</span>
                 <a
                   href={report.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-blue-600 hover:underline flex items-center gap-0.5"
+                  className="text-xs text-[#DDF160] hover:underline flex items-center gap-0.5"
                 >
                   {report.websiteUrl.replace(/^https?:\/\//i, '')} <ArrowUpRight className="w-3 h-3" />
                 </a>
               </div>
-              <p className="text-[11px] text-slate-600">Audit completed on {new Date(report.createdAt).toLocaleDateString()}</p>
+              <p className="text-[11px] text-[#838383]">Audit completed on {new Date(report.createdAt).toLocaleDateString()}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <button
               onClick={handleShare}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-all"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition-all"
             >
-              {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
+              {copiedLink ? <Check className="w-3.5 h-3.5 text-[#DDF160]" /> : <Share2 className="w-3.5 h-3.5" />}
               {copiedLink ? 'Link Copied' : 'Share Link'}
             </button>
 
             <button
               onClick={handleDownloadPDF}
               disabled={isExporting}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-70"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold shadow-md transition-all disabled:opacity-60"
             >
               {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
               {isExporting ? 'Generating PDF...' : 'Download PDF'}
@@ -151,116 +149,116 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
       <div id="report-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
         
         {/* Header Hero Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+        <div className="bg-[#1C1C1C] rounded-[2.5rem] border border-white/10 p-6 sm:p-10 shadow-2xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
             
             {/* Left Score Gauge */}
-            <div className="flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-slate-50/80 border border-slate-100">
-              <span className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-2">Overall Marketing Health</span>
-              <div className={`w-32 h-32 rounded-full border-8 flex flex-col items-center justify-center ${getScoreColor(report.scores.overall)}`}>
-                <span className="text-4xl font-extrabold tracking-tight">{report.scores.overall}</span>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-600">out of 100</span>
+            <div className="flex flex-col items-center justify-center text-center p-8 rounded-[2rem] bg-black/40 border border-white/10">
+              <span className="text-[11px] font-bold text-[#838383] uppercase tracking-widest mb-3">Overall Health</span>
+              <div className={`w-36 h-36 rounded-full border-8 flex flex-col items-center justify-center ${getScoreColor(report.scores.overall)}`}>
+                <span className="font-display text-5xl font-black tracking-tight">{report.scores.overall}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383]">out of 100</span>
               </div>
-              <div className="mt-4 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <div className="mt-4 flex items-center gap-1.5 text-xs text-[#ACACAC] font-medium">
+                <ShieldCheck className="w-4 h-4 text-[#DDF160]" />
                 <span>Verified Diagnostic Audit</span>
               </div>
             </div>
 
             {/* Middle Executive Summary */}
             <div className="lg:col-span-2 space-y-4">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 text-[#DDF160] text-xs font-semibold border border-white/10">
                 <Sparkles className="w-3.5 h-3.5" /> Executive Summary
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Audit Findings for {report.businessName}
               </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#ACACAC] leading-relaxed">
                 {report.executiveSummary}
               </p>
 
               {/* Agency Help Callout */}
-              <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-blue-50/70 border border-blue-200/80 text-blue-900">
+              <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-black/40 border border-white/10">
                 <div>
-                  <p className="text-xs font-bold">Want Trikali to execute this roadmap for you?</p>
-                  <p className="text-[11px] text-blue-700 mt-0.5">Our agency implements technical fixes, SEO content, and CRO funnels directly.</p>
+                  <p className="text-xs font-bold text-white">Want Trikali to execute this roadmap for you?</p>
+                  <p className="text-[11px] text-[#838383] mt-0.5">Our studio implements technical fixes, SEO content, and CRO funnels directly.</p>
                 </div>
                 <a
-                  href="https://trikali.com"
+                  href="https://trikali.com/contact-page.php"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold whitespace-nowrap shadow-xs transition-all flex items-center gap-1"
+                  className="px-5 py-2.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1"
                 >
-                  Book Strategy Call <ArrowUpRight className="w-3.5 h-3.5" />
+                  Say Hello <ArrowUpRight className="w-3.5 h-3.5" />
                 </a>
               </div>
             </div>
           </div>
 
           {/* 5-Category Breakdown Scores */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-8 pt-8 border-t border-slate-100">
-            <div className="p-3.5 rounded-xl bg-slate-50/60 border border-slate-100 text-center">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase flex items-center justify-center gap-1">
-                <Search className="w-3 h-3 text-blue-600" /> SEO
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-8 pt-8 border-t border-white/[0.08]">
+            <div className="p-4 rounded-2xl bg-black/30 border border-white/10 text-center">
+              <span className="text-[11px] font-semibold text-[#838383] uppercase flex items-center justify-center gap-1">
+                <Search className="w-3 h-3 text-[#DDF160]" /> SEO
               </span>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{report.scores.seo}<span className="text-xs text-slate-600 font-normal">/100</span></p>
+              <p className="font-display text-3xl font-bold text-white mt-1">{report.scores.seo}<span className="text-xs text-[#737373] font-normal">/100</span></p>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-50/60 border border-slate-100 text-center">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase flex items-center justify-center gap-1">
-                <Zap className="w-3 h-3 text-emerald-600" /> Website
+            <div className="p-4 rounded-2xl bg-black/30 border border-white/10 text-center">
+              <span className="text-[11px] font-semibold text-[#838383] uppercase flex items-center justify-center gap-1">
+                <Zap className="w-3 h-3 text-[#DDF160]" /> Website
               </span>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{report.scores.website}<span className="text-xs text-slate-600 font-normal">/100</span></p>
+              <p className="font-display text-3xl font-bold text-white mt-1">{report.scores.website}<span className="text-xs text-[#737373] font-normal">/100</span></p>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-50/60 border border-slate-100 text-center">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase flex items-center justify-center gap-1">
-                <Layers className="w-3 h-3 text-purple-600" /> Content
+            <div className="p-4 rounded-2xl bg-black/30 border border-white/10 text-center">
+              <span className="text-[11px] font-semibold text-[#838383] uppercase flex items-center justify-center gap-1">
+                <Layers className="w-3 h-3 text-[#DDF160]" /> Content
               </span>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{report.scores.content}<span className="text-xs text-slate-600 font-normal">/100</span></p>
+              <p className="font-display text-3xl font-bold text-white mt-1">{report.scores.content}<span className="text-xs text-[#737373] font-normal">/100</span></p>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-50/60 border border-slate-100 text-center">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase flex items-center justify-center gap-1">
-                <MousePointerClick className="w-3 h-3 text-amber-600" /> Conversion
+            <div className="p-4 rounded-2xl bg-black/30 border border-white/10 text-center">
+              <span className="text-[11px] font-semibold text-[#838383] uppercase flex items-center justify-center gap-1">
+                <MousePointerClick className="w-3 h-3 text-[#DDF160]" /> Conversion
               </span>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{report.scores.conversion}<span className="text-xs text-slate-600 font-normal">/100</span></p>
+              <p className="font-display text-3xl font-bold text-white mt-1">{report.scores.conversion}<span className="text-xs text-[#737373] font-normal">/100</span></p>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-50/60 border border-slate-100 text-center col-span-2 sm:col-span-1">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase flex items-center justify-center gap-1">
-                <Building2 className="w-3 h-3 text-pink-600" /> Brand
+            <div className="p-4 rounded-2xl bg-black/30 border border-white/10 text-center col-span-2 sm:col-span-1">
+              <span className="text-[11px] font-semibold text-[#838383] uppercase flex items-center justify-center gap-1">
+                <Building2 className="w-3 h-3 text-[#DDF160]" /> Brand
               </span>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{report.scores.brand}<span className="text-xs text-slate-600 font-normal">/100</span></p>
+              <p className="font-display text-3xl font-bold text-white mt-1">{report.scores.brand}<span className="text-xs text-[#737373] font-normal">/100</span></p>
             </div>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-slate-200 gap-6 text-sm font-semibold">
+        <div className="flex border-b border-white/[0.08] gap-6 text-xs font-semibold overflow-x-auto pb-1">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`pb-3 transition-colors relative ${activeTab === 'overview' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}
+            className={`pb-3 transition-colors relative whitespace-nowrap ${activeTab === 'overview' ? 'text-[#DDF160]' : 'text-[#838383] hover:text-white'}`}
           >
-            Overview & Key Opportunities
-            {activeTab === 'overview' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />}
+            Overview &amp; Key Opportunities
+            {activeTab === 'overview' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#DDF160]" />}
           </button>
           <button
             onClick={() => setActiveTab('recommendations')}
-            className={`pb-3 transition-colors relative ${activeTab === 'recommendations' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}
+            className={`pb-3 transition-colors relative whitespace-nowrap ${activeTab === 'recommendations' ? 'text-[#DDF160]' : 'text-[#838383] hover:text-white'}`}
           >
             Detailed Recommendations ({report.recommendations.length})
-            {activeTab === 'recommendations' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />}
+            {activeTab === 'recommendations' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#DDF160]" />}
           </button>
           <button
             onClick={() => setActiveTab('roadmap')}
-            className={`pb-3 transition-colors relative ${activeTab === 'roadmap' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}
+            className={`pb-3 transition-colors relative whitespace-nowrap ${activeTab === 'roadmap' ? 'text-[#DDF160]' : 'text-[#838383] hover:text-white'}`}
           >
             30-Day Action Roadmap
-            {activeTab === 'roadmap' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />}
+            {activeTab === 'roadmap' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#DDF160]" />}
           </button>
           <button
             onClick={() => setActiveTab('technical')}
-            className={`pb-3 transition-colors relative ${activeTab === 'technical' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}
+            className={`pb-3 transition-colors relative whitespace-nowrap ${activeTab === 'technical' ? 'text-[#DDF160]' : 'text-[#838383] hover:text-white'}`}
           >
             Measured Technical Data
-            {activeTab === 'technical' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />}
+            {activeTab === 'technical' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#DDF160]" />}
           </button>
         </div>
 
@@ -270,15 +268,15 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
             {/* Strengths & Critical Issues Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Critical Issues */}
-              <div className="bg-white rounded-2xl border border-red-200/80 p-6 shadow-xs space-y-4">
-                <div className="flex items-center gap-2 text-red-700">
-                  <XCircle className="w-5 h-5 text-red-600" />
-                  <h3 className="font-bold text-base">Critical Issues & Leaks</h3>
+              <div className="bg-[#1C1C1C] rounded-[2rem] border border-red-500/30 p-6 sm:p-8 space-y-4">
+                <div className="flex items-center gap-2 text-red-400">
+                  <XCircle className="w-5 h-5 text-red-400" />
+                  <h3 className="font-display font-bold text-base text-white">Critical Issues &amp; Leaks</h3>
                 </div>
                 <ul className="space-y-3">
                   {report.criticalIssues.map((issue, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-700">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0" />
+                    <li key={idx} className="flex items-start gap-2.5 text-xs text-[#ACACAC]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
                       <span className="leading-relaxed">{issue}</span>
                     </li>
                   ))}
@@ -286,15 +284,15 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
               </div>
 
               {/* Strengths */}
-              <div className="bg-white rounded-2xl border border-emerald-200/80 p-6 shadow-xs space-y-4">
-                <div className="flex items-center gap-2 text-emerald-700">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  <h3 className="font-bold text-base">Identified Strengths</h3>
+              <div className="bg-[#1C1C1C] rounded-[2rem] border border-[#DDF160]/30 p-6 sm:p-8 space-y-4">
+                <div className="flex items-center gap-2 text-[#DDF160]">
+                  <CheckCircle2 className="w-5 h-5 text-[#DDF160]" />
+                  <h3 className="font-display font-bold text-base text-white">Identified Strengths</h3>
                 </div>
                 <ul className="space-y-3">
                   {report.strengths.map((str, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-700">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                    <li key={idx} className="flex items-start gap-2.5 text-xs text-[#ACACAC]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#DDF160] mt-1.5 shrink-0" />
                       <span className="leading-relaxed">{str}</span>
                     </li>
                   ))}
@@ -303,31 +301,31 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
             </div>
 
             {/* Top 5 Growth Opportunities */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="bg-[#1C1C1C] rounded-[2.5rem] border border-white/10 p-6 sm:p-10 space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Top 5 High-Leverage Growth Opportunities</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Highest impact initiatives to accelerate pipeline conversion</p>
+                  <h3 className="font-display text-xl font-bold text-white">Top 5 High-Leverage Growth Opportunities</h3>
+                  <p className="text-xs text-[#838383] mt-0.5">Highest impact initiatives to accelerate pipeline conversion</p>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                  Agency Prioritized
+                <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/5 text-[#DDF160] border border-white/10">
+                  Prioritized
                 </span>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
                 {report.topGrowthOpportunities.map((opp, idx) => (
-                  <div key={idx} className="p-5 rounded-xl bg-slate-50/70 border border-slate-200/80 hover:border-slate-300 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-start gap-3.5">
-                      <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                  <div key={idx} className="p-6 rounded-[1.8rem] bg-black/30 border border-white/10 hover:border-[#DDF160]/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-9 h-9 rounded-xl bg-[#DDF160] text-[#161616] flex items-center justify-center font-display font-bold text-xs shrink-0">
                         {idx + 1}
                       </div>
                       <div className="space-y-1">
-                        <h4 className="font-bold text-sm text-slate-900">{opp.title}</h4>
-                        <p className="text-xs text-slate-600 leading-relaxed max-w-2xl">{opp.description}</p>
+                        <h4 className="font-display font-bold text-sm text-white">{opp.title}</h4>
+                        <p className="text-xs text-[#ACACAC] leading-relaxed max-w-2xl">{opp.description}</p>
                       </div>
                     </div>
                     <div className="sm:text-right shrink-0">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#DDF160] bg-[#DDF160]/10 px-3 py-1 rounded-full border border-[#DDF160]/30">
                         <TrendingUp className="w-3 h-3" /> {opp.potentialImpact}
                       </span>
                     </div>
@@ -341,49 +339,49 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         {/* Tab 2: Recommendations */}
         {activeTab === 'recommendations' && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="bg-[#1C1C1C] rounded-[2.5rem] border border-white/10 p-6 sm:p-10 space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">Prioritized Action Items</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Specific fixes categorized by business impact and difficulty level</p>
+                <h3 className="font-display text-xl font-bold text-white">Prioritized Action Items</h3>
+                <p className="text-xs text-[#838383] mt-0.5">Specific fixes categorized by business impact and difficulty level</p>
               </div>
 
               <div className="space-y-4">
                 {report.recommendations.map((rec) => (
-                  <div key={rec.id} className="p-6 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all space-y-4">
+                  <div key={rec.id} className="p-6 rounded-[1.8rem] border border-white/10 bg-black/30 hover:border-white/20 transition-all space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${getPriorityBadge(rec.priority)}`}>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${getPriorityBadge(rec.priority)}`}>
                           {rec.priority} Priority
                         </span>
-                        <span className="text-[10px] uppercase font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] uppercase font-semibold text-[#ACACAC] bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full">
                           {rec.category}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-slate-500">
-                        <span>Impact: <strong className="text-slate-800">{rec.expectedImpact}</strong></span>
+                      <div className="flex items-center gap-3 text-xs text-[#838383]">
+                        <span>Impact: <strong className="text-white">{rec.expectedImpact}</strong></span>
                         <span>•</span>
-                        <span>Difficulty: <strong className="text-slate-800">{rec.difficulty}</strong></span>
+                        <span>Difficulty: <strong className="text-white">{rec.difficulty}</strong></span>
                       </div>
                     </div>
 
                     <div>
-                      <h4 className="font-bold text-base text-slate-900">{rec.title}</h4>
+                      <h4 className="font-display font-bold text-base text-white">{rec.title}</h4>
                       <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                        <div className="p-3 rounded-lg bg-red-50/50 border border-red-100">
-                          <span className="font-bold text-red-900 block mb-1">Identified Issue:</span>
-                          <p className="text-red-800 leading-relaxed">{rec.problem}</p>
+                        <div className="p-4 rounded-xl bg-red-950/20 border border-red-500/20">
+                          <span className="font-bold text-red-300 block mb-1">Identified Issue:</span>
+                          <p className="text-red-200 leading-relaxed">{rec.problem}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-blue-50/50 border border-blue-100">
-                          <span className="font-bold text-blue-900 block mb-1">Why It Matters:</span>
-                          <p className="text-blue-800 leading-relaxed">{rec.whyItMatters}</p>
+                        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                          <span className="font-bold text-[#DDF160] block mb-1">Why It Matters:</span>
+                          <p className="text-[#ACACAC] leading-relaxed">{rec.whyItMatters}</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-100 flex items-start gap-2 text-xs text-slate-700 bg-slate-50/80 p-3 rounded-lg">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+                    <div className="pt-3 border-t border-white/[0.08] flex items-start gap-2.5 text-xs text-white bg-white/5 p-4 rounded-xl">
+                      <CheckCircle2 className="w-4 h-4 text-[#DDF160] mt-0.5 shrink-0" />
                       <div>
-                        <strong className="text-slate-900">Recommended Action:</strong> {rec.recommendedAction}
+                        <strong className="text-[#DDF160]">Recommended Action:</strong> {rec.recommendedAction}
                       </div>
                     </div>
                   </div>
@@ -396,27 +394,27 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         {/* Tab 3: 30-Day Roadmap */}
         {activeTab === 'roadmap' && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="bg-[#1C1C1C] rounded-[2.5rem] border border-white/10 p-6 sm:p-10 space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">30-Day Implementation Roadmap</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Sequential sprint schedule to eliminate leaks and compound organic growth</p>
+                <h3 className="font-display text-xl font-bold text-white">30-Day Implementation Roadmap</h3>
+                <p className="text-xs text-[#838383] mt-0.5">Sequential sprint schedule to eliminate leaks and compound organic growth</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {report.actionPlan30Days.map((step, idx) => (
-                  <div key={idx} className="p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-blue-300 transition-all space-y-3">
+                  <div key={idx} className="p-6 rounded-[1.8rem] border border-white/10 bg-black/30 hover:border-[#DDF160]/40 transition-all space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DDF160]/10 text-[#DDF160] text-xs font-bold border border-[#DDF160]/20">
                         <Calendar className="w-3.5 h-3.5" /> {step.dayRange}
                       </span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${getPriorityBadge(step.priority)}`}>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${getPriorityBadge(step.priority)}`}>
                         {step.priority} Priority
                       </span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block">{step.focusArea}</span>
-                      <h4 className="font-bold text-sm text-slate-900 mt-0.5">{step.actionTitle}</h4>
-                      <p className="text-xs text-slate-600 mt-2 leading-relaxed">{step.description}</p>
+                      <span className="text-[11px] font-semibold text-[#838383] uppercase tracking-wider block">{step.focusArea}</span>
+                      <h4 className="font-display font-bold text-sm text-white mt-1">{step.actionTitle}</h4>
+                      <p className="text-xs text-[#ACACAC] mt-2 leading-relaxed">{step.description}</p>
                     </div>
                   </div>
                 ))}
@@ -428,41 +426,41 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         {/* Tab 4: Measured Technical Data */}
         {activeTab === 'technical' && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="bg-[#1C1C1C] rounded-[2.5rem] border border-white/10 p-6 sm:p-10 space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Live Measured Data & Technical Telemetry</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Real parameters extracted safely from your publicly accessible pages</p>
+                  <h3 className="font-display text-xl font-bold text-white">Live Measured Data &amp; Technical Telemetry</h3>
+                  <p className="text-xs text-[#838383] mt-0.5">Real parameters extracted safely from your publicly accessible pages</p>
                 </div>
-                <span className="text-xs text-slate-500 font-mono bg-slate-100 px-2.5 py-1 rounded-md">
+                <span className="text-xs text-[#DDF160] font-mono bg-white/5 border border-white/10 px-3 py-1 rounded-full">
                   HTTP {report.measuredData.httpStatus || 200} OK
                 </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 space-y-1">
-                  <span className="text-slate-500 font-semibold">Response Time (Latency)</span>
-                  <p className="text-sm font-bold text-slate-900">{report.measuredData.responseTimeMs} ms</p>
+                <div className="p-5 rounded-2xl border border-white/10 bg-black/30 space-y-1">
+                  <span className="text-[#838383] font-semibold">Response Time (Latency)</span>
+                  <p className="font-display text-lg font-bold text-white">{report.measuredData.responseTimeMs} ms</p>
                 </div>
-                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 space-y-1">
-                  <span className="text-slate-500 font-semibold">Page Payload Weight</span>
-                  <p className="text-sm font-bold text-slate-900">{report.measuredData.pageSizeKb} KB</p>
+                <div className="p-5 rounded-2xl border border-white/10 bg-black/30 space-y-1">
+                  <span className="text-[#838383] font-semibold">Page Payload Weight</span>
+                  <p className="font-display text-lg font-bold text-white">{report.measuredData.pageSizeKb} KB</p>
                 </div>
-                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 space-y-1">
-                  <span className="text-slate-500 font-semibold">Visible Word Count</span>
-                  <p className="text-sm font-bold text-slate-900">~{report.measuredData.contentWordCount} words</p>
+                <div className="p-5 rounded-2xl border border-white/10 bg-black/30 space-y-1">
+                  <span className="text-[#838383] font-semibold">Visible Word Count</span>
+                  <p className="font-display text-lg font-bold text-white">~{report.measuredData.contentWordCount} words</p>
                 </div>
-                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 space-y-1">
-                  <span className="text-slate-500 font-semibold">Image Alt Attribute Coverage</span>
-                  <p className="text-sm font-bold text-slate-900">{report.measuredData.imagesWithAlt} / {report.measuredData.imagesTotal} images</p>
+                <div className="p-5 rounded-2xl border border-white/10 bg-black/30 space-y-1">
+                  <span className="text-[#838383] font-semibold">Image Alt Attribute Coverage</span>
+                  <p className="font-display text-lg font-bold text-white">{report.measuredData.imagesWithAlt} / {report.measuredData.imagesTotal} images</p>
                 </div>
-                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 space-y-1">
-                  <span className="text-slate-500 font-semibold">Internal Navigation Links</span>
-                  <p className="text-sm font-bold text-slate-900">{report.measuredData.internalLinksCount} links</p>
+                <div className="p-5 rounded-2xl border border-white/10 bg-black/30 space-y-1">
+                  <span className="text-[#838383] font-semibold">Internal Navigation Links</span>
+                  <p className="font-display text-lg font-bold text-white">{report.measuredData.internalLinksCount} links</p>
                 </div>
-                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 space-y-1">
-                  <span className="text-slate-500 font-semibold">Robots.txt & Sitemap</span>
-                  <p className="text-sm font-bold text-slate-900">
+                <div className="p-5 rounded-2xl border border-white/10 bg-black/30 space-y-1">
+                  <span className="text-[#838383] font-semibold">Robots.txt &amp; Sitemap</span>
+                  <p className="font-display text-sm font-bold text-white">
                     {report.measuredData.hasRobotsTxt ? '✓ Robots.txt' : '✗ No Robots.txt'} • {report.measuredData.hasSitemap ? '✓ Sitemap' : '✗ No Sitemap'}
                   </p>
                 </div>
@@ -470,24 +468,24 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
 
               {/* Tag Inspections */}
               <div className="space-y-3 pt-2">
-                <div className="p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1.5">
-                  <span className="text-xs font-bold text-slate-700">HTML Title Tag:</span>
-                  <p className="text-xs font-mono text-slate-900 break-words">{report.measuredData.title || '(No title tag found)'}</p>
+                <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-1">
+                  <span className="text-xs font-bold text-[#838383]">HTML Title Tag:</span>
+                  <p className="text-xs font-mono text-white break-words">{report.measuredData.title || '(No title tag found)'}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1.5">
-                  <span className="text-xs font-bold text-slate-700">Meta Description:</span>
-                  <p className="text-xs font-mono text-slate-900 break-words">{report.measuredData.metaDescription || '(No meta description tag found)'}</p>
+                <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-1">
+                  <span className="text-xs font-bold text-[#838383]">Meta Description:</span>
+                  <p className="text-xs font-mono text-white break-words">{report.measuredData.metaDescription || '(No meta description tag found)'}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1.5">
-                  <span className="text-xs font-bold text-slate-700">H1 Tag(s):</span>
+                <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-1">
+                  <span className="text-xs font-bold text-[#838383]">H1 Tag(s):</span>
                   {report.measuredData.h1Tags && report.measuredData.h1Tags.length > 0 ? (
-                    <ul className="list-disc list-inside text-xs font-mono text-slate-900 space-y-1">
+                    <ul className="list-disc list-inside text-xs font-mono text-white space-y-1">
                       {report.measuredData.h1Tags.map((h1, i) => (
                         <li key={i}>{h1}</li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-xs text-red-600 font-semibold">No H1 tags detected.</p>
+                    <p className="text-xs text-red-400 font-semibold">No H1 tags detected.</p>
                   )}
                 </div>
               </div>
@@ -496,25 +494,25 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         )}
 
         {/* Agency Bottom Conversion Bar */}
-        <div className="rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="rounded-[2.5rem] bg-gradient-to-r from-black via-[#1C1C1C] to-black p-8 sm:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10 shadow-2xl">
           <div className="space-y-2 text-center md:text-left">
-            <h3 className="text-xl font-bold">Ready to turn this audit into real revenue?</h3>
-            <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+            <h3 className="font-display text-2xl font-bold">Ready to turn this audit into real revenue?</h3>
+            <p className="text-xs text-[#ACACAC] max-w-xl leading-relaxed">
               Trikali has grown organic search pipeline and digital conversion rates for SMB and high-growth organizations worldwide. Let our senior marketing team implement these high-priority fixes.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
             <a
-              href="https://trikali.com"
+              href="https://trikali.com/contact-page.php"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+              className="px-8 py-3.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] font-bold text-xs shadow-lg transition-all flex items-center gap-1.5"
             >
-              Book Agency Consultation <ArrowUpRight className="w-4 h-4" />
+              Say Hello <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
             <Link
               href="/"
-              className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition-all"
+              className="px-6 py-3.5 rounded-full border border-white/20 hover:border-white text-white font-semibold text-xs transition-all hover:bg-white/5"
             >
               Audit Another Website
             </Link>
@@ -525,4 +523,3 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
     </div>
   );
 }
-
