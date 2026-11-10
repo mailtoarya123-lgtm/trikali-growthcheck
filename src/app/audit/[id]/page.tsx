@@ -1,83 +1,101 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { Suspense, useEffect, useState, use } from 'react';
 import AuditReportView from '@/components/AuditReportView';
-import { memoryStore } from '@/lib/store';
-import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { AuditReport } from '@/types/audit';
+import { Loader2, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
 
-export const instant = false;
+function AuditContent({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const [report, setReport] = useState<AuditReport | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function AuditPage({
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadAudit() {
+      try {
+        const res = await fetch(`/api/audit/${id}`);
+        if (!res.ok) {
+          throw new Error('Audit report could not be found or has expired.');
+        }
+        const data = await res.json();
+        if (isMounted) {
+          setReport(data);
+          setLoading(false);
+        }
+      } catch (err: unknown) {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : 'Failed to load audit');
+          setLoading(false);
+        }
+      }
+    }
+
+    loadAudit();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6 space-y-4">
+        <div className="w-12 h-12 rounded-full border-2 border-white/10 border-t-[#DDF160] animate-spin flex items-center justify-center">
+          <Loader2 className="w-5 h-5 text-[#DDF160] animate-pulse" />
+        </div>
+        <p className="text-sm font-semibold text-white">Loading your audit dashboard...</p>
+        <p className="text-xs text-[#838383]">Compiling verified technical diagnostics and growth roadmap.</p>
+      </div>
+    );
+  }
+
+  if (error || !report) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6 space-y-5">
+        <div className="w-14 h-14 rounded-2xl bg-red-950/40 border border-red-500/30 flex items-center justify-center text-red-400">
+          <AlertCircle className="w-7 h-7" />
+        </div>
+        <div>
+          <h2 className="font-display text-2xl font-bold text-white">Audit Report Not Found</h2>
+          <p className="text-xs text-[#ACACAC] mt-1 max-w-sm">
+            {error || 'This audit report may have expired or was not generated yet.'}
+          </p>
+        </div>
+        <Link
+          href="/"
+          className="px-6 py-2.5 rounded-full bg-[#DDF160] text-[#161616] text-xs font-bold transition-all shadow-md"
+        >
+          Generate a Free Audit
+        </Link>
+      </div>
+    );
+  }
+
+  return <AuditReportView report={report} />;
+}
+
+export default function AuditPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-
-  let audit: AuditReport | null = memoryStore.getAudit(id);
-
-  if (!audit && isSupabaseConfigured && supabaseAdmin) {
-    try {
-      const { data, error } = await supabaseAdmin
-        .from('audits')
-        .select(`*, audit_scores(*)`)
-        .eq('id', id)
-        .single();
-
-      if (data && !error) {
-        const scores = data.audit_scores?.[0] || {
-          overall: data.overall_score || 70,
-          seo: 70,
-          website: 70,
-          content: 70,
-          conversion: 70,
-          brand: 70,
-        };
-
-        audit = {
-          id: data.id,
-          businessName: data.contact_name || 'Business Client',
-          websiteUrl: data.website_url,
-          industry: 'Business',
-          country: 'Global',
-          targetAudience: 'Prospects',
-          goals: ['leads', 'seo'],
-          contactName: data.contact_name || 'Business Leader',
-          workEmail: data.work_email || '',
-          createdAt: data.created_at,
-          scores: {
-            overall: data.overall_score || scores.overall,
-            seo: scores.seo,
-            website: scores.website,
-            content: scores.content,
-            conversion: scores.conversion,
-            brand: scores.brand,
-          },
-          executiveSummary: data.executive_summary || '',
-          strengths: data.strengths || [],
-          criticalIssues: data.critical_issues || [],
-          weaknesses: data.weaknesses || [],
-          websiteAuditSummary: data.website_audit_summary || '',
-          seoAuditSummary: data.seo_audit_summary || '',
-          contentAuditSummary: data.content_audit_summary || '',
-          conversionAuditSummary: data.conversion_audit_summary || '',
-          brandPositioningSummary: data.brand_positioning_summary || '',
-          socialMediaOpportunities: data.social_media_opportunities || [],
-          competitorResearchNotes: data.competitor_research_notes || '',
-          topGrowthOpportunities: data.top_growth_opportunities || [],
-          recommendations: [],
-          actionPlan30Days: data.action_plan_30_days || [],
-          measuredData: data.measured_data || {},
-          source: data.source || 'ai_live',
-        };
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6 space-y-4">
+          <div className="w-12 h-12 rounded-full border-2 border-white/10 border-t-[#DDF160] animate-spin flex items-center justify-center">
+            <Loader2 className="w-5 h-5 text-[#DDF160] animate-pulse" />
+          </div>
+          <p className="text-sm font-semibold text-white">Loading your audit dashboard...</p>
+          <p className="text-xs text-[#838383]">Compiling verified technical diagnostics and growth roadmap.</p>
+        </div>
       }
-    } catch {
-      // Handled by null check below
-    }
-  }
-
-  if (!audit) {
-    notFound();
-  }
-
-  return <AuditReportView report={audit} />;
+    >
+      <AuditContent params={params} />
+    </Suspense>
+  );
 }
