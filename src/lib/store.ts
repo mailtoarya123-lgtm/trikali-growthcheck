@@ -1,10 +1,27 @@
 import { AuditReport, LeadRecord } from '@/types/audit';
+import fs from 'fs';
+import path from 'path';
 
-// In-memory persistent fallback store during runtime when Supabase is not yet connected
+const isServer = typeof window === 'undefined';
+const TMP_DIR = '/tmp/trikali-growthcheck';
+
+function ensureTmpDir() {
+  if (isServer) {
+    try {
+      if (!fs.existsSync(TMP_DIR)) {
+        fs.mkdirSync(TMP_DIR, { recursive: true });
+      }
+    } catch {
+      // safe fallback
+    }
+  }
+}
+
+// In-memory fallback map
 const globalAudits = new Map<string, AuditReport>();
 const globalLeads = new Map<string, LeadRecord>();
 
-// Preload with high-quality sample audit data for instant preview & demonstration
+// Preload sample audit
 const seedAudit: AuditReport = {
   id: 'demo-audit-sample',
   businessName: 'Apex Cloud Logistics',
@@ -237,20 +254,92 @@ globalLeads.set(seedLead.id, seedLead);
 export const memoryStore = {
   saveAudit: (audit: AuditReport) => {
     globalAudits.set(audit.id, audit);
+
+    // Persist to /tmp file system for serverless cross-invocation sharing
+    if (isServer) {
+      ensureTmpDir();
+      try {
+        const filePath = path.join(TMP_DIR, `audit-${audit.id}.json`);
+        fs.writeFileSync(filePath, JSON.stringify(audit), 'utf8');
+      } catch {
+        // non-blocking
+      }
+    }
     return audit;
   },
+
   getAudit: (id: string): AuditReport | null => {
-    return globalAudits.get(id) || null;
+    if (globalAudits.has(id)) {
+      return globalAudits.get(id) || null;
+    }
+
+    // Check disk storage in /tmp
+    if (isServer) {
+      try {
+        const filePath = path.join(TMP_DIR, `audit-${id}.json`);
+        if (fs.existsSync(filePath)) {
+          const raw = fs.readFileSync(filePath, 'utf8');
+          const audit = JSON.parse(raw);
+          globalAudits.set(id, audit);
+          return audit;
+        }
+      } catch {
+        // non-blocking
+      }
+    }
+
+    if (id === 'demo-audit-sample') {
+      return seedAudit;
+    }
+
+    return null;
   },
+
   saveLead: (lead: LeadRecord) => {
     globalLeads.set(lead.id, lead);
+
+    if (isServer) {
+      ensureTmpDir();
+      try {
+        const filePath = path.join(TMP_DIR, `lead-${lead.id}.json`);
+        fs.writeFileSync(filePath, JSON.stringify(lead), 'utf8');
+      } catch {
+        // non-blocking
+      }
+    }
     return lead;
   },
+
   getAllLeads: (): LeadRecord[] => {
-    return Array.from(globalLeads.values()).sort(
+    const list: LeadRecord[] = Array.from(globalLeads.values());
+
+    if (isServer) {
+      try {
+        if (fs.existsSync(TMP_DIR)) {
+          const files = fs.readdirSync(TMP_DIR);
+          for (const f of files) {
+            if (f.startsWith('lead-') && f.endsWith('.json')) {
+              try {
+                const lead: LeadRecord = JSON.parse(fs.readFileSync(path.join(TMP_DIR, f), 'utf8'));
+                if (!list.some(l => l.id === lead.id)) {
+                  list.push(lead);
+                }
+              } catch {
+                // skip corrupted
+              }
+            }
+          }
+        }
+      } catch {
+        // fallback
+      }
+    }
+
+    return list.sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   },
+
   updateLeadStatus: (id: string, status: LeadRecord['status'], notes?: string): LeadRecord | null => {
     const lead = globalLeads.get(id);
     if (!lead) return null;
@@ -258,7 +347,15 @@ export const memoryStore = {
     if (notes !== undefined) lead.notes = notes;
     lead.updatedAt = new Date().toISOString();
     globalLeads.set(id, lead);
+
+    if (isServer) {
+      try {
+        const filePath = path.join(TMP_DIR, `lead-${id}.json`);
+        fs.writeFileSync(filePath, JSON.stringify(lead), 'utf8');
+      } catch {
+        // non-blocking
+      }
+    }
     return lead;
   }
 };
-

@@ -136,7 +136,11 @@ export default function MultiStepAuditForm() {
         throw new Error(data.error || 'Failed to complete audit inspection.');
       }
 
-      router.push(`/audit/${data.auditId}`);
+      if (typeof window !== 'undefined') {
+        window.location.href = `/audit/${data.auditId}`;
+      } else {
+        router.push(`/audit/${data.auditId}`);
+      }
     } catch (err: unknown) {
       clearInterval(interval);
       setIsLoading(false);
