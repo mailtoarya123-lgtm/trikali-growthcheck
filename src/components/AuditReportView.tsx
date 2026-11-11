@@ -28,7 +28,8 @@ import {
   Activity,
   Copy,
   Terminal,
-  Compass
+  Compass,
+  Crosshair
 } from 'lucide-react';
 import { AuditReport } from '@/types/audit';
 
@@ -36,7 +37,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
   const [isExporting, setIsExporting] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
-  const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [showPointers, setShowPointers] = useState(true);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-[#DDF160] border-[#DDF160] bg-[#DDF160]/10';
@@ -169,6 +170,8 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
   ];
 
   const cleanDomain = report.websiteUrl.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+  const primaryH1 = report.measuredData.h1Tags.filter(Boolean)[0];
+  const hasH1Issue = report.measuredData.h1Tags.length === 0 || report.measuredData.h1Tags.some(h => !h.trim()) || report.measuredData.h1Tags.length > 1;
 
   return (
     <div className="min-h-screen bg-[#161616] text-[#FAF7F6] pb-28">
@@ -204,7 +207,10 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
               Scorecard
             </a>
             <a href="#section-visual" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
-              Visual &amp; SERP
+              Annotated Screenshots
+            </a>
+            <a href="#section-images" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
+              Image Inspector ({report.measuredData.flaggedImages?.length || 0})
             </a>
             <a href="#section-opportunities" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
               Leaks &amp; Growth
@@ -214,9 +220,6 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
             </a>
             <a href="#section-roadmap" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
               30-Day Plan
-            </a>
-            <a href="#section-telemetry" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
-              Raw Telemetry
             </a>
           </nav>
 
@@ -242,7 +245,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
       </div>
 
       {/* Main Single-Scroll Report Container */}
-      <div id="report-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-12">
+      <div id="report-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-14">
         
         {/* =====================================================================
             SECTION 1: EXECUTIVE SCORECARD & 5-PILLAR DIAGNOSTIC BREAKDOWN
@@ -357,370 +360,598 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         </section>
 
         {/* =====================================================================
-            SECTION 2: VISUAL SITE, SERP & SOCIAL INSPECTOR
+            SECTION 2: ANNOTATED DESKTOP & MOBILE SCREENSHOTS POINTING OUT ISSUES
         ===================================================================== */}
         <section id="section-visual" className="scroll-mt-36 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 px-1">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 px-1">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#DDF160] flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5" /> Section 01 • Visual Proof &amp; Search Presence
+                <Crosshair className="w-3.5 h-3.5" /> Section 01 • Annotated Multi-Viewport Screenshots
               </span>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
-                Live Viewport, Google SERP &amp; Social Share Inspection
+                Live Desktop &amp; Mobile Screenshots Pointing Out Exact Leaks
               </h2>
+              <p className="text-xs text-[#838383] mt-1">
+                Numbered diagnostic callout pins (`#1`–`#6`) mapped directly onto live renders of {cleanDomain}
+              </p>
             </div>
-            <p className="text-xs text-[#838383]">
-              How buyers and search crawlers experience {cleanDomain} right now
-            </p>
+
+            <button
+              type="button"
+              onClick={() => setShowPointers(!showPointers)}
+              className={`self-start sm:self-auto px-4 py-2 rounded-full text-xs font-bold border transition-all flex items-center gap-2 ${
+                showPointers
+                  ? 'bg-[#DDF160] text-[#161616] border-[#DDF160]'
+                  : 'bg-white/5 text-white border-white/20 hover:border-white'
+              }`}
+            >
+              <Crosshair className="w-3.5 h-3.5" />
+              {showPointers ? 'Diagnostic Pointers: ON' : 'Diagnostic Pointers: OFF'}
+            </button>
           </div>
 
+          {/* Desktop + Mobile Side-by-Side Annotated Screenshots */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            {/* Left 7 Cols: Interactive Browser Viewport & Diagnostic Pinpoints */}
-            <div className="lg:col-span-7 bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 flex flex-col justify-between space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
+            
+            {/* Left 8 Cols: Annotated Desktop Above-the-Fold Screenshot */}
+            <div className="lg:col-span-8 bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 flex flex-col justify-between space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#DDF160]">
-                    <Monitor className="w-3.5 h-3.5" /> Captured Above-the-Fold Viewport
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#DDF160] flex items-center gap-1.5">
+                    <Monitor className="w-3.5 h-3.5" /> Desktop Above-the-Fold Capture (1280×800)
                   </span>
                   <h3 className="font-display font-bold text-lg text-white mt-0.5">
-                    {cleanDomain}
+                    Desktop Visual Teardown — {cleanDomain}
                   </h3>
                 </div>
-
-                <div className="inline-flex rounded-full bg-black/50 p-1 border border-white/10 text-xs font-semibold">
-                  <button
-                    type="button"
-                    onClick={() => setViewportMode('desktop')}
-                    className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
-                      viewportMode === 'desktop' ? 'bg-[#DDF160] text-[#161616] font-bold' : 'text-[#ACACAC] hover:text-white'
-                    }`}
-                  >
-                    <Monitor className="w-3.5 h-3.5" /> Desktop (1200×800)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewportMode('mobile')}
-                    className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
-                      viewportMode === 'mobile' ? 'bg-[#DDF160] text-[#161616] font-bold' : 'text-[#ACACAC] hover:text-white'
-                    }`}
-                  >
-                    <Smartphone className="w-3.5 h-3.5" /> Mobile (390×844)
-                  </button>
-                </div>
+                <span className="text-[11px] font-mono text-[#ACACAC] bg-black/50 px-3 py-1 rounded-full border border-white/10">
+                  4 Pointed-Out Zones
+                </span>
               </div>
 
-              {/* Browser Chrome Window */}
+              {/* Browser Window Frame with Pointing-Out Hotspot Pins */}
               <div className="rounded-2xl overflow-hidden border border-white/15 bg-[#0E0E0E] shadow-2xl">
                 <div className="px-4 py-2.5 bg-[#181818] border-b border-white/10 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400/70" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
                   </div>
                   <div className="flex-1 max-w-md px-3 py-1 rounded-md bg-black/60 border border-white/10 text-[11px] font-mono text-[#ACACAC] truncate text-center">
                     {report.measuredData.normalizedUrl}
                   </div>
                   <span className="text-[10px] font-mono text-[#DDF160] bg-[#DDF160]/10 px-2 py-0.5 rounded border border-[#DDF160]/30">
-                    {report.measuredData.responseTimeMs}ms
+                    {report.measuredData.responseTimeMs}ms TTFB
                   </span>
                 </div>
 
-                <div className="relative bg-black/90 flex items-center justify-center overflow-hidden h-[360px] sm:h-[400px]">
+                {/* Screenshot + Visual Callout Pins & Target Rings */}
+                <div className="relative bg-black/90 h-[380px] sm:h-[440px] overflow-hidden">
                   {report.measuredData.screenshotUrl ? (
                     <img
-                      src={
-                        viewportMode === 'mobile' && report.measuredData.mobileScreenshotUrl
-                          ? report.measuredData.mobileScreenshotUrl
-                          : report.measuredData.screenshotUrl
-                      }
-                      alt={`Live screenshot of ${report.businessName}`}
+                      src={report.measuredData.screenshotUrl}
+                      alt={`Desktop live screenshot of ${report.businessName}`}
                       fetchPriority="high"
-                      className={`object-cover object-top transition-all duration-300 ${
-                        viewportMode === 'mobile'
-                          ? 'w-[220px] h-[370px] rounded-2xl border-2 border-white/20 shadow-2xl'
-                          : 'w-full h-full'
-                      }`}
+                      className="w-full h-full object-cover object-top"
                     />
                   ) : (
-                    <div className="text-xs text-[#838383] p-8 text-center">Live preview unavailable</div>
+                    <div className="w-full h-full flex items-center justify-center text-xs text-[#838383]">
+                      Live desktop preview unavailable
+                    </div>
+                  )}
+
+                  {/* Subtle dark vignette when pointers are active so callouts pop clearly */}
+                  {showPointers && (
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/65 pointer-events-none" />
+                  )}
+
+                  {/* POINTER OVERLAYS ON DESKTOP SCREENSHOT */}
+                  {showPointers && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      
+                      {/* PIN #1: Top-Left Header / H1 Heading Callout */}
+                      <div className="absolute top-4 left-4 flex items-start gap-2.5 max-w-[290px] sm:max-w-[330px]">
+                        <div className="relative flex items-center justify-center shrink-0 mt-1">
+                          <span className={`animate-ping absolute inline-flex h-7 w-7 rounded-full opacity-60 ${hasH1Issue ? 'bg-red-500' : 'bg-[#DDF160]'}`} />
+                          <span className={`relative w-7 h-7 rounded-full font-display font-black text-xs flex items-center justify-center shadow-lg border-2 border-black ${hasH1Issue ? 'bg-red-500 text-white' : 'bg-[#DDF160] text-[#161616]'}`}>
+                            1
+                          </span>
+                        </div>
+                        <div className={`bg-black/90 backdrop-blur-md rounded-xl p-3 border shadow-2xl ${hasH1Issue ? 'border-red-500/60' : 'border-[#DDF160]/60'}`}>
+                          <span className={`text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1 ${hasH1Issue ? 'text-red-400' : 'text-[#DDF160]'}`}>
+                            <AlertTriangle className="w-3 h-3 shrink-0" />
+                            {report.measuredData.h1Tags.length === 0
+                              ? 'Pointing Out: Missing <h1> Tag'
+                              : report.measuredData.h1Tags.some(h => !h.trim())
+                              ? 'Pointing Out: Empty <h1></h1> Tag'
+                              : report.measuredData.h1Tags.length > 1
+                              ? `Pointing Out: ${report.measuredData.h1Tags.length} Duplicate H1s`
+                              : 'Pointing Out: Primary <h1> Headline'}
+                          </span>
+                          <p className="text-[11px] text-white font-medium mt-1 line-clamp-2 leading-snug">
+                            {primaryH1 ? `"${primaryH1}"` : 'Search crawlers see no primary H1 headline text in the hero container.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* PIN #2: Top-Right Media & Image Alt Leak Callout */}
+                      <div className="absolute top-4 right-4 hidden sm:flex items-start gap-2.5 max-w-[290px]">
+                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-3 border border-amber-400/60 shadow-2xl text-right">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center justify-end gap-1">
+                            <ImageIcon className="w-3 h-3 shrink-0" />
+                            Pointing Out: {report.measuredData.imagesMissingAlt} Unindexed Images
+                          </span>
+                          <p className="text-[11px] text-[#ACACAC] mt-1 leading-snug">
+                            {report.measuredData.imagesMissingAlt} of {report.measuredData.imagesTotal} page visuals have missing or generic <code className="text-white">alt</code> text ({report.measuredData.pageSizeKb} KB HTML).
+                          </p>
+                        </div>
+                        <div className="relative flex items-center justify-center shrink-0 mt-1">
+                          <span className="animate-ping absolute inline-flex h-7 w-7 rounded-full bg-amber-400 opacity-60" />
+                          <span className="relative w-7 h-7 rounded-full bg-amber-400 text-[#161616] font-display font-black text-xs flex items-center justify-center shadow-lg border-2 border-black">
+                            2
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* PIN #3: Bottom-Left Above-the-Fold CTA & Conversion Zone */}
+                      <div className="absolute bottom-4 left-4 flex items-end gap-2.5 max-w-[320px]">
+                        <div className="relative flex items-center justify-center shrink-0 mb-1">
+                          <span className="animate-ping absolute inline-flex h-7 w-7 rounded-full bg-[#DDF160] opacity-60" />
+                          <span className="relative w-7 h-7 rounded-full bg-[#DDF160] text-[#161616] font-display font-black text-xs flex items-center justify-center shadow-lg border-2 border-black">
+                            3
+                          </span>
+                        </div>
+                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-3 border border-[#DDF160]/60 shadow-2xl">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#DDF160] flex items-center gap-1">
+                            <MousePointerClick className="w-3 h-3 shrink-0" />
+                            Pointing Out: Hero CTA Funnel ({report.measuredData.ctaButtonTexts.length} Buttons)
+                          </span>
+                          <p className="text-[11px] text-white mt-1 truncate">
+                            {report.measuredData.ctaButtonTexts.length > 0
+                              ? `Detected: ${report.measuredData.ctaButtonTexts.slice(0, 3).map(c => `"${c}"`).join(', ')}`
+                              : 'No high-contrast primary conversion button detected above fold'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* PIN #4: Bottom-Right Pixel & Schema Telemetry */}
+                      <div className="absolute bottom-4 right-4 hidden md:flex items-end gap-2.5 max-w-[290px]">
+                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-3 border border-white/30 shadow-2xl text-right">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-white flex items-center justify-end gap-1">
+                            <Activity className="w-3 h-3 text-[#DDF160] shrink-0" />
+                            Pointing Out: Tracking &amp; Schema Layer
+                          </span>
+                          <p className="text-[11px] text-[#ACACAC] mt-1 truncate">
+                            {report.measuredData.hasAnalyticsOrPixels?.length
+                              ? `Active: ${report.measuredData.hasAnalyticsOrPixels.join(', ')}`
+                              : 'Warning: No remarketing or analytics pixels found'}
+                          </p>
+                        </div>
+                        <div className="relative flex items-center justify-center shrink-0 mb-1">
+                          <span className="relative w-7 h-7 rounded-full bg-white text-[#161616] font-display font-black text-xs flex items-center justify-center shadow-lg border-2 border-black">
+                            4
+                          </span>
+                        </div>
+                      </div>
+
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* Clean Below-Viewport Diagnostic Callout Strip (No Overlapping Clutter) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                {/* H1 Status Pin */}
-                <div className={`p-3.5 rounded-2xl border ${
-                  report.measuredData.h1Tags.length === 1 && report.measuredData.h1Tags[0]?.trim()
-                    ? 'bg-emerald-950/20 border-emerald-500/30'
-                    : 'bg-red-950/25 border-red-500/35'
-                }`}>
-                  <span className={`text-[11px] font-bold flex items-center gap-1 ${
-                    report.measuredData.h1Tags.length === 1 && report.measuredData.h1Tags[0]?.trim()
-                      ? 'text-emerald-300'
-                      : 'text-red-400'
-                  }`}>
-                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                    {report.measuredData.h1Tags.length === 0
-                      ? 'Missing H1 Heading'
-                      : report.measuredData.h1Tags.some(h => !h.trim())
-                      ? 'Empty <h1> Tag Found'
-                      : report.measuredData.h1Tags.length > 1
-                      ? `${report.measuredData.h1Tags.length} Competing H1 Tags`
-                      : 'Primary H1 Verified'}
+              {/* Numbered Legend Strip Underneath Desktop Screenshot */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 flex items-start gap-3">
+                  <span className={`w-6 h-6 rounded-full font-display font-black text-xs flex items-center justify-center shrink-0 ${hasH1Issue ? 'bg-red-500 text-white' : 'bg-[#DDF160] text-[#161616]'}`}>
+                    1
                   </span>
-                  <p className="text-[11px] text-[#ACACAC] mt-1 truncate">
-                    {report.measuredData.h1Tags.filter(Boolean)[0]
-                      ? `"${report.measuredData.h1Tags.filter(Boolean)[0]}"`
-                      : 'No valid headline text inside H1'}
-                  </p>
+                  <div>
+                    <span className="font-bold text-white block">Hero Heading &amp; Keyword Hook</span>
+                    <span className="text-[11px] text-[#ACACAC]">
+                      {primaryH1 ? `H1 "${primaryH1}" (${report.measuredData.h2TagsCount} H2s, ${report.measuredData.h3TagsCount} H3s)` : 'Critical: Missing or empty primary H1 tag on landing view.'}
+                    </span>
+                  </div>
                 </div>
-
-                {/* Image Alt Coverage Pin */}
-                <div className={`p-3.5 rounded-2xl border ${
-                  report.measuredData.imagesMissingAlt === 0
-                    ? 'bg-emerald-950/20 border-emerald-500/30'
-                    : 'bg-amber-950/25 border-amber-500/35'
-                }`}>
-                  <span className={`text-[11px] font-bold flex items-center gap-1 ${
-                    report.measuredData.imagesMissingAlt === 0 ? 'text-emerald-300' : 'text-amber-300'
-                  }`}>
-                    <ImageIcon className="w-3.5 h-3.5 shrink-0" />
-                    {report.measuredData.imagesMissingAlt} / {report.measuredData.imagesTotal} Images Missing Alt
+                <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-amber-400 text-[#161616] font-display font-black text-xs flex items-center justify-center shrink-0">
+                    2
                   </span>
-                  <p className="text-[11px] text-[#ACACAC] mt-1 truncate">
-                    {report.measuredData.imagesMissingAlt > 0
-                      ? 'Hurting Google Image & AI indexing'
-                      : 'All visual assets properly described'}
-                  </p>
-                </div>
-
-                {/* Above-Fold CTA Pin */}
-                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-[11px] font-bold text-[#DDF160] flex items-center gap-1">
-                    <MousePointerClick className="w-3.5 h-3.5 shrink-0" />
-                    {report.measuredData.ctaButtonTexts.length} Above-Fold CTAs
-                  </span>
-                  <p className="text-[11px] text-white mt-1 truncate">
-                    {report.measuredData.ctaButtonTexts.length > 0
-                      ? report.measuredData.ctaButtonTexts.slice(0, 3).map(c => `"${c}"`).join(', ')
-                      : 'No clear action buttons detected'}
-                  </p>
+                  <div>
+                    <span className="font-bold text-white block">Visual Asset &amp; Alt-Text Coverage</span>
+                    <span className="text-[11px] text-[#ACACAC]">
+                      {report.measuredData.imagesWithAlt} of {report.measuredData.imagesTotal} images have descriptive alt tags ({report.measuredData.imagesMissingAlt} flagged below).
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right 5 Cols: Google SERP Simulator + OpenGraph Card + Detected Stack */}
-            <div className="lg:col-span-5 flex flex-col justify-between gap-6">
-              {/* Google SERP Preview Card */}
-              <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 space-y-4">
+            {/* Right 4 Cols: Annotated Mobile Viewport Screenshot (Shown Simultaneously!) */}
+            <div className="lg:col-span-4 bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 flex flex-col justify-between space-y-5">
+              <div className="flex items-center justify-between gap-2">
                 <div>
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#DDF160]">
-                    <Globe className="w-3.5 h-3.5" /> Google Search Snippet Simulator
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#DDF160] flex items-center gap-1.5">
+                    <Smartphone className="w-3.5 h-3.5" /> Mobile Viewport (390×844)
                   </span>
-                  <h3 className="font-display font-bold text-base text-white mt-0.5">
-                    How {report.businessName} Appears on Google
+                  <h3 className="font-display font-bold text-lg text-white mt-0.5">
+                    Mobile UX &amp; Thumb-Zone
                   </h3>
                 </div>
+                <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full border ${
+                  report.measuredData.hasViewportMeta
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                    : 'bg-red-500/10 border-red-500/30 text-red-300'
+                }`}>
+                  {report.measuredData.hasViewportMeta ? '✓ Responsive' : '✗ No Viewport'}
+                </span>
+              </div>
 
-                <div className="p-4 rounded-2xl bg-[#111111] border border-white/10 space-y-1.5">
-                  <div className="flex items-center gap-2 text-[11px] text-[#ACACAC]">
-                    <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-[#DDF160]">
+              {/* Mobile Phone Frame with Annotated Callouts */}
+              <div className="relative mx-auto w-full max-w-[270px] h-[440px] rounded-[2.4rem] border-4 border-[#2E2E2E] bg-[#0A0A0A] shadow-2xl overflow-hidden flex flex-col">
+                {/* Phone Notch */}
+                <div className="h-6 bg-[#141414] flex items-center justify-center border-b border-white/10 shrink-0">
+                  <div className="w-16 h-2 rounded-full bg-white/15" />
+                </div>
+
+                {/* Mobile Screenshot Image */}
+                <div className="relative flex-1 bg-black overflow-hidden">
+                  {report.measuredData.mobileScreenshotUrl || report.measuredData.screenshotUrl ? (
+                    <img
+                      src={report.measuredData.mobileScreenshotUrl || report.measuredData.screenshotUrl}
+                      alt={`Mobile live screenshot of ${report.businessName}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover object-top"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-xs text-[#838383] p-4 text-center">
+                      Mobile preview unavailable
+                    </div>
+                  )}
+
+                  {showPointers && (
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/75 pointer-events-none p-3 flex flex-col justify-between">
+                      {/* Pin #5: Mobile Viewport & Render Blocking */}
+                      <div className="flex items-start gap-2">
+                        <span className="w-6 h-6 rounded-full bg-[#DDF160] text-[#161616] font-display font-black text-xs flex items-center justify-center shrink-0 shadow-lg border border-black">
+                          5
+                        </span>
+                        <div className="bg-black/90 backdrop-blur-md border border-[#DDF160]/50 rounded-xl p-2 text-[10px]">
+                          <span className="font-bold text-[#DDF160] block">
+                            Mobile Render ({report.measuredData.scriptsCount || 0} JS Scripts)
+                          </span>
+                          <span className="text-[#ACACAC]">
+                            {report.measuredData.responseTimeMs}ms initial server response on cellular
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Pin #6: Mobile Thumb-Zone CTA */}
+                      <div className="flex items-end gap-2">
+                        <span className="w-6 h-6 rounded-full bg-amber-400 text-[#161616] font-display font-black text-xs flex items-center justify-center shrink-0 shadow-lg border border-black">
+                          6
+                        </span>
+                        <div className="bg-black/90 backdrop-blur-md border border-amber-400/50 rounded-xl p-2 text-[10px]">
+                          <span className="font-bold text-amber-300 block">
+                            Mobile Thumb-Zone Conversion
+                          </span>
+                          <span className="text-[#ACACAC]">
+                            {report.measuredData.detectedContactMethods.hasContactForm
+                              ? 'Form detected — simplify fields for mobile tap completion'
+                              : 'Add sticky bottom mobile CTA bar for 1-tap booking'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Mobile Summary Note */}
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 text-xs space-y-1">
+                <span className="font-bold text-white flex items-center gap-1.5">
+                  <Smartphone className="w-3.5 h-3.5 text-[#DDF160]" /> Mobile Conversion Diagnosis
+                </span>
+                <p className="text-[11px] text-[#ACACAC] leading-relaxed line-clamp-3">
+                  {report.conversionAuditSummary}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Google Search (SERP) Simulator + OpenGraph Social Share Card Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Google SERP Preview with Pointed-Out Length Diagnostics */}
+            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 space-y-5 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#DDF160]">
+                      <Globe className="w-3.5 h-3.5" /> Google Search Result Preview
+                    </span>
+                    <h3 className="font-display font-bold text-lg text-white mt-0.5">
+                      How {report.businessName} Appears on Google SERPs
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[#ACACAC]">
+                    Live Extracted Meta
+                  </span>
+                </div>
+
+                {/* Simulated Google Result Card */}
+                <div className="p-5 rounded-2xl bg-[#111111] border border-white/15 space-y-2 relative">
+                  <div className="flex items-center gap-2.5 text-xs text-[#ACACAC]">
+                    <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-[#DDF160]">
                       {report.businessName.charAt(0).toUpperCase()}
                     </div>
                     <div className="truncate">
                       <span className="text-white font-medium block leading-none">{report.businessName}</span>
-                      <span className="text-[10px] text-[#838383]">{report.measuredData.normalizedUrl}</span>
+                      <span className="text-[11px] text-[#838383]">{report.measuredData.normalizedUrl}</span>
                     </div>
                   </div>
-                  <p className="text-sm font-semibold text-[#8AB4F8] line-clamp-1 pt-0.5">
+                  <p className="text-base font-semibold text-[#8AB4F8] line-clamp-1 pt-1">
                     {report.measuredData.title || 'Missing HTML <title> Tag — Untapped Ranking Signal'}
                   </p>
                   <p className="text-xs text-[#BDC1C6] line-clamp-2 leading-relaxed">
                     {report.measuredData.metaDescription || 'No meta description tag detected. Google will scrape random page fragments instead of a high-converting marketing hook.'}
                   </p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2.5 text-[11px]">
-                  <div className={`p-3 rounded-xl border ${
-                    report.measuredData.titleLength && report.measuredData.titleLength >= 30 && report.measuredData.titleLength <= 65
-                      ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
-                      : 'bg-amber-950/20 border-amber-500/30 text-amber-300'
-                  }`}>
-                    <span className="font-bold block">Title: {report.measuredData.titleLength || 0} chars</span>
-                    <span className="text-[10px] opacity-80">Optimal: 50–60 chars</span>
-                  </div>
-                  <div className={`p-3 rounded-xl border ${
-                    report.measuredData.metaDescriptionLength && report.measuredData.metaDescriptionLength >= 110 && report.measuredData.metaDescriptionLength <= 165
-                      ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
-                      : 'bg-red-950/20 border-red-500/30 text-red-300'
-                  }`}>
-                    <span className="font-bold block">Meta Desc: {report.measuredData.metaDescriptionLength || 0} chars</span>
-                    <span className="text-[10px] opacity-80">
-                      {(report.measuredData.metaDescriptionLength || 0) > 165 ? 'Truncated (>160 chars)' : 'Optimal: 120–160 chars'}
-                    </span>
-                  </div>
-                </div>
               </div>
 
-              {/* OpenGraph Social Share Preview & Tech Stack */}
-              <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 space-y-4 flex-1 flex flex-col justify-between">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#DDF160] flex items-center gap-1.5">
-                      <Share2 className="w-3.5 h-3.5" /> Social Share Card (OpenGraph)
-                    </span>
-                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
-                      report.measuredData.ogImageUrl
-                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                        : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
-                    }`}>
-                      {report.measuredData.ogImageUrl ? '✓ og:image Active' : '✗ Missing og:image'}
-                    </span>
-                  </div>
-
-                  {report.measuredData.ogImageUrl ? (
-                    <div className="rounded-xl overflow-hidden border border-white/10 bg-black h-36 flex items-center justify-center">
-                      <img
-                        src={report.measuredData.ogImageUrl}
-                        alt="OpenGraph Social Preview"
-                        loading="lazy"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/25 flex items-start gap-3">
-                      <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-                      <div className="text-xs space-y-1">
-                        <p className="font-bold text-amber-300">No OpenGraph Social Image (`og:image`)</p>
-                        <p className="text-[11px] text-[#ACACAC] leading-relaxed">
-                          When shared on LinkedIn, Slack, X, or WhatsApp, links to {cleanDomain} render without a branded preview banner.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Detected Marketing Pixels & Schema */}
-                <div className="pt-3 border-t border-white/10 space-y-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#838383] flex items-center gap-1.5">
-                    <Activity className="w-3.5 h-3.5 text-[#DDF160]" /> Detected Analytics, Pixels &amp; Schema
+              {/* Pointing-Out Callouts for Title & Meta */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className={`p-3.5 rounded-xl border ${
+                  report.measuredData.titleLength && report.measuredData.titleLength >= 30 && report.measuredData.titleLength <= 65
+                    ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
+                    : 'bg-amber-950/20 border-amber-500/30 text-amber-300'
+                }`}>
+                  <span className="font-bold block">
+                    Pointing Out Title: {report.measuredData.titleLength || 0} chars
                   </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {report.measuredData.hasAnalyticsOrPixels && report.measuredData.hasAnalyticsOrPixels.length > 0 ? (
-                      report.measuredData.hasAnalyticsOrPixels.map((px, i) => (
-                        <span key={i} className="px-2.5 py-1 rounded-lg bg-[#DDF160]/10 border border-[#DDF160]/30 text-[#DDF160] text-[11px] font-semibold">
-                          ✓ {px}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-[11px] font-semibold">
-                        ✗ No Marketing Pixels Detected
-                      </span>
-                    )}
-                    {report.measuredData.schemaTypes && report.measuredData.schemaTypes.length > 0 ? (
-                      report.measuredData.schemaTypes.slice(0, 4).map((sc, i) => (
-                        <span key={i} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/15 text-white text-[11px]">
-                          Schema: {sc}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px]">
-                        ✗ No JSON-LD Schema
-                      </span>
-                    )}
-                  </div>
+                  <span className="text-[11px] opacity-85">
+                    {(report.measuredData.titleLength || 0) === 0
+                      ? 'Missing <title> tag hurts ranking'
+                      : (report.measuredData.titleLength || 0) > 65
+                      ? 'Truncated in Google SERPs (>60 chars)'
+                      : 'Optimal 50–60 char length'}
+                  </span>
+                </div>
+                <div className={`p-3.5 rounded-xl border ${
+                  report.measuredData.metaDescriptionLength && report.measuredData.metaDescriptionLength >= 110 && report.measuredData.metaDescriptionLength <= 165
+                    ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
+                    : 'bg-red-950/20 border-red-500/30 text-red-300'
+                }`}>
+                  <span className="font-bold block">
+                    Pointing Out Meta: {report.measuredData.metaDescriptionLength || 0} chars
+                  </span>
+                  <span className="text-[11px] opacity-85">
+                    {(report.measuredData.metaDescriptionLength || 0) === 0
+                      ? 'Missing description lowers organic CTR'
+                      : (report.measuredData.metaDescriptionLength || 0) > 165
+                      ? 'Cut off with ellipsis (>160 chars)'
+                      : 'Optimal 120–160 char hook'}
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Flagged Images Missing Alt Attributes (Integrated Directly into Visual Inspection) */}
-          {report.measuredData.flaggedImages && report.measuredData.flaggedImages.length > 0 && (
-            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-red-400 flex items-center gap-1.5">
-                    <ImageIcon className="w-3.5 h-3.5" /> Visual SEO Leak Inspector
+            {/* OpenGraph Social Share Card Simulator */}
+            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 space-y-5 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#DDF160]">
+                      <Share2 className="w-3.5 h-3.5" /> LinkedIn, X &amp; Slack Social Card
+                    </span>
+                    <h3 className="font-display font-bold text-lg text-white mt-0.5">
+                      OpenGraph (`og:image`) Visual Share Preview
+                    </h3>
+                  </div>
+                  <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full border ${
+                    report.measuredData.ogImageUrl
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                      : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  }`}>
+                    {report.measuredData.ogImageUrl ? '✓ og:image Active' : '✗ Missing og:image'}
                   </span>
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-white mt-0.5">
-                    Flagged Images Missing Alt Attributes ({report.measuredData.imagesMissingAlt} of {report.measuredData.imagesTotal} Total)
-                  </h3>
-                  <p className="text-xs text-[#838383] mt-0.5">
-                    Actual images extracted from {cleanDomain} without descriptive <code className="text-white">alt=&quot;...&quot;</code> text, paired with ready-to-copy fixes
-                  </p>
                 </div>
-                <span className="px-3.5 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold">
-                  {report.measuredData.imagesMissingAlt} Unindexed Visuals
-                </span>
+
+                {/* Social Share Card Mockup */}
+                <div className="rounded-2xl overflow-hidden border border-white/15 bg-[#111111]">
+                  <div className="h-44 bg-black/80 relative flex items-center justify-center overflow-hidden border-b border-white/10">
+                    {report.measuredData.ogImageUrl ? (
+                      <img
+                        src={report.measuredData.ogImageUrl}
+                        alt="OpenGraph Social Share Preview"
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="p-6 text-center space-y-1.5">
+                        <AlertTriangle className="w-7 h-7 text-amber-400 mx-auto" />
+                        <p className="text-xs font-bold text-amber-300">
+                          Pointing Out: Missing `og:image` Social Banner
+                        </p>
+                        <p className="text-[11px] text-[#838383] max-w-sm mx-auto">
+                          When prospects share {cleanDomain} on LinkedIn, Slack, or WhatsApp, it renders as a plain grey box instead of a branded preview graphic.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3.5 bg-[#161616] space-y-0.5">
+                    <span className="text-[10px] uppercase tracking-wider text-[#838383] font-mono block">
+                      {cleanDomain}
+                    </span>
+                    <p className="text-xs font-bold text-white truncate">
+                      {report.measuredData.title || report.businessName}
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {report.measuredData.flaggedImages.map((img, i) => {
-                  const suggestedAltText = `alt="${img.suggestedAlt || `${report.businessName} - ${report.industry}`}"`;
-                  const copyId = `alt-${i}`;
-                  return (
-                    <div key={i} className="rounded-2xl border border-white/10 bg-black/40 p-4 flex flex-col sm:flex-row gap-4 items-start">
-                      <div className="w-full sm:w-28 h-28 rounded-xl overflow-hidden bg-black/80 border border-white/15 shrink-0 flex items-center justify-center relative">
+              {/* Detected Pixels & Schema Strip */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                {report.measuredData.hasAnalyticsOrPixels && report.measuredData.hasAnalyticsOrPixels.length > 0 ? (
+                  report.measuredData.hasAnalyticsOrPixels.map((px, i) => (
+                    <span key={i} className="px-2.5 py-1 rounded-lg bg-[#DDF160]/10 border border-[#DDF160]/30 text-[#DDF160] text-[11px] font-semibold">
+                      ✓ {px}
+                    </span>
+                  ))
+                ) : (
+                  <span className="px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-[11px] font-semibold">
+                    ✗ No Marketing Pixels Detected
+                  </span>
+                )}
+                {report.measuredData.schemaTypes && report.measuredData.schemaTypes.length > 0 ? (
+                  report.measuredData.schemaTypes.slice(0, 3).map((sc, i) => (
+                    <span key={i} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/15 text-white text-[11px]">
+                      Schema: {sc}
+                    </span>
+                  ))
+                ) : (
+                  <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px]">
+                    ✗ No JSON-LD Schema
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =====================================================================
+            SECTION 3: EXTRACTED PAGE IMAGES & VISUAL ASSET INSPECTOR
+        ===================================================================== */}
+        <section id="section-images" className="scroll-mt-36 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 px-1">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-red-400 flex items-center gap-1.5">
+                <ImageIcon className="w-3.5 h-3.5" /> Section 02 • Extracted Visual Assets &amp; Image SEO Inspector
+              </span>
+              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
+                Page Images Pointing Out Alt-Text &amp; Core Web Vitals Issues ({report.measuredData.flaggedImages?.length || 0} Inspected)
+              </h2>
+              <p className="text-xs text-[#838383] mt-1">
+                Live images extracted directly from {cleanDomain} showing exact HTML tag defects and copy-ready SEO fixes
+              </p>
+            </div>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-white text-xs font-semibold">
+                {report.measuredData.imagesTotal} Total Page Images
+              </span>
+              <span className="px-3.5 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold">
+                {report.measuredData.imagesMissingAlt} Need Optimization
+              </span>
+            </div>
+          </div>
+
+          {report.measuredData.flaggedImages && report.measuredData.flaggedImages.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {report.measuredData.flaggedImages.map((img, i) => {
+                const suggestedAltText = `alt="${img.suggestedAlt || `${report.businessName} - ${report.industry}`}"`;
+                const copyId = `alt-${i}`;
+                const badgeText =
+                  img.issueType === 'generic_alt'
+                    ? `Generic Alt ("${img.currentAlt}")`
+                    : img.issueType === 'missing_dimensions'
+                    ? 'Missing Width/Height (CLS)'
+                    : 'Missing Alt Attribute';
+
+                return (
+                  <div
+                    key={i}
+                    className="rounded-[2rem] border border-white/10 bg-[#1C1C1C] overflow-hidden flex flex-col justify-between shadow-xl hover:border-[#DDF160]/40 transition-all"
+                  >
+                    <div>
+                      {/* Visual Image Preview Header with Pointing-Out Pin */}
+                      <div className="relative h-48 bg-black/90 border-b border-white/10 flex items-center justify-center p-3 overflow-hidden group">
                         <img
                           src={img.src}
-                          alt={img.suggestedAlt || 'Flagged website asset'}
+                          alt={img.suggestedAlt || 'Inspected website asset'}
                           loading="lazy"
-                          className="w-full h-full object-cover"
+                          className="max-h-full max-w-full object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
                         />
-                        <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-red-600 text-white text-[9px] font-bold uppercase">
-                          Missing Alt
-                        </span>
+
+                        {/* Numbered Point-Out Badge on Top-Left */}
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600/95 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-lg">
+                          <span>#{i + 1}</span>
+                          <span>•</span>
+                          <span>{badgeText}</span>
+                        </div>
+
+                        <a
+                          href={img.src}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/80 hover:bg-[#DDF160] text-white hover:text-[#161616] text-[10px] font-bold border border-white/20 transition-all flex items-center gap-1"
+                        >
+                          Full Image <ArrowUpRight className="w-3 h-3" />
+                        </a>
                       </div>
-                      <div className="flex-1 min-w-0 space-y-2 w-full">
+
+                      {/* Image Diagnostic Details */}
+                      <div className="p-5 space-y-3">
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-xs font-bold text-white truncate">
-                            {img.src.split('/').pop()?.split('?')[0] || `Image Asset #${i + 1}`}
+                            {img.src.split('/').pop()?.split('?')[0] || `Visual Asset #${i + 1}`}
                           </span>
-                          <a
-                            href={img.src}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] text-[#DDF160] hover:underline shrink-0 flex items-center gap-0.5"
-                          >
-                            Open Image <ArrowUpRight className="w-2.5 h-2.5" />
-                          </a>
+                          <span className="text-[10px] font-mono text-[#838383] shrink-0">
+                            Asset #{i + 1}
+                          </span>
                         </div>
-                        <div className="p-2 rounded-lg bg-red-950/30 border border-red-500/20">
-                          <span className="text-[10px] font-bold text-red-300 block">Detected HTML Tag:</span>
-                          <code className="text-[10px] text-red-200 font-mono break-all line-clamp-1">{img.tagSnippet}</code>
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-[#DDF160]/10 border border-[#DDF160]/30 flex items-center justify-between gap-2">
-                          <div className="min-w-0">
-                            <span className="text-[10px] font-bold text-[#DDF160] block">Recommended Alt Fix:</span>
-                            <code className="text-[11px] text-white font-mono break-words">{suggestedAltText}</code>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleCopyText(suggestedAltText, copyId)}
-                            className="px-2.5 py-1.5 rounded-lg bg-black/50 hover:bg-black text-[10px] font-semibold text-[#DDF160] border border-[#DDF160]/30 shrink-0 flex items-center gap-1 transition-all"
-                          >
-                            {copiedSnippet === copyId ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                            {copiedSnippet === copyId ? 'Copied' : 'Copy'}
-                          </button>
+
+                        {/* Pointed-Out Issue Explanation */}
+                        <div className="p-2.5 rounded-xl bg-red-950/30 border border-red-500/25 space-y-1">
+                          <span className="text-[10px] font-bold text-red-300 uppercase tracking-wider flex items-center gap-1">
+                            <AlertTriangle className="w-3 h-3 shrink-0" />
+                            {img.issueLabel || 'Missing Descriptive Alt Attribute'}
+                          </span>
+                          <code className="text-[10px] text-red-200/90 font-mono break-all line-clamp-2 block">
+                            {img.tagSnippet}
+                          </code>
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+
+                    {/* Copy-Ready Recommended Fix Footer */}
+                    <div className="px-5 pb-5 pt-1">
+                      <div className="p-3 rounded-xl bg-[#DDF160]/10 border border-[#DDF160]/30 flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="text-[10px] font-bold text-[#DDF160] uppercase tracking-wider block">
+                            Recommended SEO Fix:
+                          </span>
+                          <code className="text-[11px] text-white font-mono break-words line-clamp-2">
+                            {suggestedAltText}
+                          </code>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyText(suggestedAltText, copyId)}
+                          className="px-3 py-1.5 rounded-lg bg-black/60 hover:bg-black text-[10px] font-bold text-[#DDF160] border border-[#DDF160]/30 shrink-0 flex items-center gap-1 transition-all"
+                        >
+                          {copiedSnippet === copyId ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                          {copiedSnippet === copyId ? 'Copied' : 'Copy'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="p-6 rounded-2xl bg-[#1C1C1C] border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>All {report.measuredData.imagesTotal} inspected images on the primary landing view include descriptive alt attributes and explicit dimensions.</span>
             </div>
           )}
         </section>
 
         {/* =====================================================================
-            SECTION 3: CRITICAL LEAKS, STRENGTHS & TOP 5 GROWTH OPPORTUNITIES
+            SECTION 4: CRITICAL LEAKS, STRENGTHS & TOP 5 GROWTH OPPORTUNITIES
         ===================================================================== */}
         <section id="section-opportunities" className="scroll-mt-36 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 px-1">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#DDF160] flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5" /> Section 02 • Diagnostic Synthesis &amp; Growth Levers
+                <TrendingUp className="w-3.5 h-3.5" /> Section 03 • Diagnostic Synthesis &amp; Growth Levers
               </span>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
                 Critical Leaks, Strengths &amp; Top 5 Growth Opportunities
@@ -823,13 +1054,13 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         </section>
 
         {/* =====================================================================
-            SECTION 4: DETAILED TECHNICAL & STRATEGIC RECOMMENDATIONS
+            SECTION 5: DETAILED TECHNICAL & STRATEGIC RECOMMENDATIONS
         ===================================================================== */}
         <section id="section-recommendations" className="scroll-mt-36 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 px-1">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#DDF160] flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> Section 03 • Engineering &amp; Marketing Playbook
+                <Sparkles className="w-3.5 h-3.5" /> Section 04 • Engineering &amp; Marketing Playbook
               </span>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
                 Prioritized Action Items ({report.recommendations.length})
@@ -899,13 +1130,13 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         </section>
 
         {/* =====================================================================
-            SECTION 5: 30-DAY EXECUTION ROADMAP
+            SECTION 6: 30-DAY EXECUTION ROADMAP
         ===================================================================== */}
         <section id="section-roadmap" className="scroll-mt-36 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 px-1">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#DDF160] flex items-center gap-1.5">
-                <Compass className="w-3.5 h-3.5" /> Section 04 • Execution Timeline
+                <Compass className="w-3.5 h-3.5" /> Section 05 • Execution Timeline
               </span>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
                 30-Day Prioritized Implementation Roadmap
@@ -957,13 +1188,13 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         </section>
 
         {/* =====================================================================
-            SECTION 6: MEASURED TECHNICAL DATA & DOM TELEMETRY
+            SECTION 7: MEASURED TECHNICAL DATA & DOM TELEMETRY
         ===================================================================== */}
         <section id="section-telemetry" className="scroll-mt-36 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 px-1">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#DDF160] flex items-center gap-1.5">
-                <Terminal className="w-3.5 h-3.5" /> Section 05 • Verified Technical Telemetry
+                <Terminal className="w-3.5 h-3.5" /> Section 06 • Verified Technical Telemetry
               </span>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
                 Live Measured DOM &amp; Server Data
@@ -1000,7 +1231,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                   {report.measuredData.imagesWithAlt}/{report.measuredData.imagesTotal}
                 </p>
                 <span className="text-[10px] text-red-400 block">
-                  {report.measuredData.imagesMissingAlt} missing alt
+                  {report.measuredData.imagesMissingAlt} need alt fix
                 </span>
               </div>
               <div className="p-4 rounded-2xl border border-white/10 bg-black/35 space-y-1">

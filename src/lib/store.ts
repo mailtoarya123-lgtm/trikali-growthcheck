@@ -196,7 +196,7 @@ const seedAudit: AuditReport = {
     normalizedUrl: 'https://trikali.com',
     screenshotUrl: 'https://api.microlink.io/?url=https%3A%2F%2Ftrikali.com&screenshot=true&meta=false&embed=screenshot.url',
     mobileScreenshotUrl: 'https://api.microlink.io/?url=https%3A%2F%2Ftrikali.com&screenshot=true&viewport.width=390&viewport.height=844&viewport.isMobile=true&meta=false&embed=screenshot.url',
-    ogImageUrl: 'https://trikali.com/assets/img/og-preview.jpg',
+    ogImageUrl: 'https://trikali.com/img/instagram/post_1.png',
     isAccessible: true,
     httpStatus: 200,
     responseTimeMs: 382,
@@ -216,18 +216,56 @@ const seedAudit: AuditReport = {
     h2TagsCount: 8,
     h3TagsCount: 14,
     imagesTotal: 22,
-    imagesWithAlt: 18,
-    imagesMissingAlt: 4,
+    imagesWithAlt: 16,
+    imagesMissingAlt: 6,
     flaggedImages: [
       {
-        src: 'https://trikali.com/assets/img/hero-mockup.png',
-        tagSnippet: '<img src="/assets/img/hero-mockup.png" class="hero-img">',
-        suggestedAlt: 'Marketing Growth Dashboard preview'
+        src: 'https://trikali.com/img/ti.png',
+        tagSnippet: '<img class="mxd-move" src="img/ti.png" alt="Hero Image">',
+        currentAlt: 'Hero Image',
+        issueType: 'generic_alt',
+        issueLabel: 'Generic Alt ("Hero Image") — Wastes Commercial Keyword Signal',
+        suggestedAlt: 'Trikali AI Automation & Digital Growth Studio Hero Visual'
       },
       {
-        src: 'https://trikali.com/assets/img/client-case-study.jpg',
-        tagSnippet: '<img src="/assets/img/client-case-study.jpg" class="case-img">',
-        suggestedAlt: 'Client e-commerce revenue growth chart'
+        src: 'https://trikali.com/img/cube.webp',
+        tagSnippet: '<img class="mxd-rotate" src="img/cube.webp" alt="Hero Image">',
+        currentAlt: 'Hero Image',
+        issueType: 'generic_alt',
+        issueLabel: 'Duplicate Generic Alt ("Hero Image") + Missing Width/Height',
+        suggestedAlt: '3D Interactive Digital Experience & Web Engineering Graphic'
+      },
+      {
+        src: 'https://trikali.com/img/instagram/post_1.png',
+        tagSnippet: '<img src="img/instagram/post_1.png" alt="10 Lettering Posters for Design Lovers" loading="lazy">',
+        currentAlt: '10 Lettering Posters for Design Lovers',
+        issueType: 'missing_dimensions',
+        issueLabel: 'Missing Explicit Width & Height Attributes (CLS Layout Shift Risk)',
+        suggestedAlt: 'Trikali Brand Design & Creative Direction Portfolio Showcase'
+      },
+      {
+        src: 'https://trikali.com/img/instagram/post_2.png',
+        tagSnippet: '<img src="img/instagram/post_2.png" alt="If they comeback - Visual Motion" loading="lazy">',
+        currentAlt: 'If they comeback - Visual Motion',
+        issueType: 'missing_dimensions',
+        issueLabel: 'Uncompressed PNG (No WebP/AVIF srcset) + Missing Dimensions',
+        suggestedAlt: 'Trikali Motion Design & Interactive Brand Campaign'
+      },
+      {
+        src: 'https://trikali.com/img/instagram/post_3.png',
+        tagSnippet: '<img src="img/instagram/post_3.png" alt="DAXHA Mobile UI/UX Interface" loading="lazy">',
+        currentAlt: 'DAXHA Mobile UI/UX Interface',
+        issueType: 'missing_dimensions',
+        issueLabel: 'Missing Explicit Width & Height Attributes (CLS Risk)',
+        suggestedAlt: 'DAXHA Mobile App UI/UX Conversion Architecture by Trikali'
+      },
+      {
+        src: 'https://trikali.com/img/instagram/post_4.png',
+        tagSnippet: '<img src="img/instagram/post_4.png" alt="Frank Lyman Editorial Campaign" loading="lazy">',
+        currentAlt: 'Frank Lyman Editorial Campaign',
+        issueType: 'missing_dimensions',
+        issueLabel: 'Missing Explicit Width & Height Attributes (CLS Risk)',
+        suggestedAlt: 'Frank Lyman E-Commerce Editorial Campaign by Trikali Studio'
       }
     ],
     internalLinksCount: 32,

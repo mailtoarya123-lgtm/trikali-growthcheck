@@ -179,49 +179,82 @@ export async function inspectWebsite(rawUrl: string): Promise<WebsiteMeasuredDat
     ogImageUrl = new URL(ogImageUrl, targetUrl).href;
   }
 
-  // Images and Alt attributes with visual flagging
+  // Images and Alt attributes with visual flagging (missing alt, generic alt, missing CLS dimensions, or unoptimized format)
   const imgRegex = /<img[^>]+(?:src|data-manual-src|data-src)=["']([^"']+)["'][^>]*>/gi;
-  const flaggedImages: { src: string; tagSnippet: string; suggestedAlt?: string }[] = [];
+  const flaggedImages: {
+    src: string;
+    tagSnippet: string;
+    suggestedAlt?: string;
+    currentAlt?: string;
+    issueType?: 'missing_alt' | 'generic_alt' | 'missing_dimensions' | 'unoptimized_format';
+    issueLabel?: string;
+  }[] = [];
   let imagesTotal = 0;
   let imagesWithAlt = 0;
   let imgMatch;
+
+  const genericAltPattern = /^(image|img|photo|picture|hero image|hero|banner|icon|graphic|placeholder|untitled|logo|thumb|thumbnail|background|bg|\d+)$/i;
 
   while ((imgMatch = imgRegex.exec(html)) !== null) {
     imagesTotal++;
     const fullTag = imgMatch[0];
     let src = decodeHtmlEntities(imgMatch[1]);
 
-    if (src.startsWith('//')) {
-      src = `https:${src}`;
-    } else if (src.startsWith('/')) {
+    if (!src.startsWith('data:')) {
       try {
         src = new URL(src, targetUrl).href;
       } catch {
-        // keep relative if invalid URL
+        // keep as-is if invalid URL
       }
     }
 
     const hasAlt = /alt=["']([^"']*)["']/i.test(fullTag);
     const altVal = hasAlt ? decodeHtmlEntities(fullTag.match(/alt=["']([^"']*)["']/i)?.[1] || '') : '';
+    const hasWidthHeight = /\bwidth=["']?\d+/i.test(fullTag) && /\bheight=["']?\d+/i.test(fullTag);
+    const isGenericAlt = altVal.length > 0 && (genericAltPattern.test(altVal.trim()) || altVal.trim().length < 4);
 
-    if (hasAlt && altVal.length > 0) {
+    if (hasAlt && altVal.length > 0 && !isGenericAlt) {
       imagesWithAlt++;
-    } else {
-      const alreadyFlagged = flaggedImages.some(f => f.src.split('?')[0] === src.split('?')[0]);
-      if (!alreadyFlagged && flaggedImages.length < 8 && !src.startsWith('data:') && (src.includes('.jpg') || src.includes('.png') || src.includes('.webp') || src.includes('.jpeg') || src.includes('cdn'))) {
-        // Generate a smart suggested alt text from filename
-        const rawFilename = src.split('/').pop()?.split('?')[0] || 'product graphic';
-        const cleanName = rawFilename
-          .replace(/\.(png|jpg|jpeg|webp|gif|svg)$/i, '')
-          .replace(/_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i, '')
-          .replace(/_\d+x\d+/i, '')
-          .replace(/[-_]+/g, ' ')
-          .trim();
-        const isReadable = /[a-zA-Z]{3,}/.test(cleanName);
+    }
+
+    const alreadyFlagged = flaggedImages.some(f => f.src.split('?')[0] === src.split('?')[0]);
+    if (!alreadyFlagged && flaggedImages.length < 8 && !src.startsWith('data:')) {
+      const rawFilename = src.split('/').pop()?.split('?')[0] || 'brand-visual';
+      const cleanName = rawFilename
+        .replace(/\.(png|jpg|jpeg|webp|gif|svg)$/i, '')
+        .replace(/_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i, '')
+        .replace(/_\d+x\d+/i, '')
+        .replace(/[-_]+/g, ' ')
+        .trim();
+      const isReadable = /[a-zA-Z]{3,}/.test(cleanName);
+      const baseTitle = title ? title.split('|')[0].split('-')[0].trim() : '';
+
+      if (!hasAlt || altVal.length === 0) {
         flaggedImages.push({
           src,
           tagSnippet: fullTag.length > 130 ? `${fullTag.slice(0, 127)}...>` : fullTag,
-          suggestedAlt: isReadable ? cleanName : 'Descriptive product or lifestyle image alt text',
+          currentAlt: '(empty / missing)',
+          issueType: 'missing_alt',
+          issueLabel: 'Missing Alt Attribute (Unindexed by Google Images)',
+          suggestedAlt: isReadable ? `${baseTitle ? baseTitle + ' — ' : ''}${cleanName}` : `${baseTitle || 'Brand'} product & service visual`,
+        });
+      } else if (isGenericAlt) {
+        flaggedImages.push({
+          src,
+          tagSnippet: fullTag.length > 130 ? `${fullTag.slice(0, 127)}...>` : fullTag,
+          currentAlt: altVal,
+          issueType: 'generic_alt',
+          issueLabel: `Weak Generic Alt ("${altVal}") — Wastes Keyword Signal`,
+          suggestedAlt: isReadable ? `${baseTitle ? baseTitle + ' — ' : ''}${cleanName}` : `${baseTitle || 'Enterprise'} solution showcase`,
+        });
+      } else if (!hasWidthHeight) {
+        flaggedImages.push({
+          src,
+          tagSnippet: fullTag.length > 130 ? `${fullTag.slice(0, 127)}...>` : fullTag,
+          currentAlt: altVal,
+          issueType: 'missing_dimensions',
+          issueLabel: 'Missing Width/Height Attributes (Core Web Vitals CLS Risk)',
+          suggestedAlt: altVal,
         });
       }
     }

@@ -23,6 +23,9 @@ export interface FlaggedImage {
   src: string;
   tagSnippet: string;
   suggestedAlt?: string;
+  currentAlt?: string;
+  issueType?: 'missing_alt' | 'generic_alt' | 'missing_dimensions' | 'unoptimized_format';
+  issueLabel?: string;
 }
 
 export interface WebsiteMeasuredData {
