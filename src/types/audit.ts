@@ -19,9 +19,18 @@ export interface AuditFormData {
   consent: boolean;
 }
 
+export interface FlaggedImage {
+  src: string;
+  tagSnippet: string;
+  suggestedAlt?: string;
+}
+
 export interface WebsiteMeasuredData {
   url: string;
   normalizedUrl: string;
+  screenshotUrl: string;
+  mobileScreenshotUrl?: string;
+  ogImageUrl?: string;
   isAccessible: boolean;
   httpStatus?: number;
   responseTimeMs?: number;
@@ -30,12 +39,20 @@ export interface WebsiteMeasuredData {
   titleLength?: number;
   metaDescription?: string;
   metaDescriptionLength?: number;
+  canonicalUrl?: string;
+  hasSchemaOrg?: boolean;
+  schemaTypes?: string[];
+  hasAnalyticsOrPixels?: string[];
+  scriptsCount?: number;
+  stylesheetsCount?: number;
   h1Tags: string[];
+  h2Tags: string[];
   h2TagsCount: number;
   h3TagsCount: number;
   imagesTotal: number;
   imagesWithAlt: number;
   imagesMissingAlt: number;
+  flaggedImages: FlaggedImage[];
   internalLinksCount: number;
   externalLinksCount: number;
   hasViewportMeta: boolean;

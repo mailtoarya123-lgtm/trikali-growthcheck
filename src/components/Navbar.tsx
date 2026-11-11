@@ -32,7 +32,6 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-[#ACACAC]">
           <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
           <a href="#what-we-check" className="hover:text-white transition-colors">Audit Scope</a>
-          <a href="#pricing" className="hover:text-white transition-colors">Pricing & Plans</a>
           <a href="https://trikali.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1">
             Studio <ArrowUpRight className="w-3.5 h-3.5 text-[#737373]" />
           </a>

@@ -46,6 +46,21 @@ export function validateSafeUrl(rawUrl: string): { valid: boolean; normalizedUrl
   return { valid: true, normalizedUrl: parsed.toString() };
 }
 
+function decodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&amp;/gi, '&')
+    .replace(/&ndash;/gi, '–')
+    .replace(/&mdash;/gi, '—')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&quot;/gi, '"')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&#(\d+);/g, (_, num) => String.fromCharCode(parseInt(num, 10)))
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /**
  * Robustly inspects and measures live technical attributes of the target website.
  * Follows redirects securely with size limits and timeouts.
@@ -126,35 +141,132 @@ export async function inspectWebsite(rawUrl: string): Promise<WebsiteMeasuredDat
 
   // Parse HTML elements with safe regex-based extraction
   const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
-  const title = titleMatch ? titleMatch[1].trim() : undefined;
+  const title = titleMatch ? decodeHtmlEntities(titleMatch[1]) : undefined;
 
   const metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["']/i) ||
                         html.match(/<meta[^>]*content=["']([^"']*)["'][^>]*name=["']description["']/i);
-  const metaDescription = metaDescMatch ? metaDescMatch[1].trim() : undefined;
+  const metaDescription = metaDescMatch ? decodeHtmlEntities(metaDescMatch[1]) : undefined;
 
   // H1 Tags
   const h1Regex = /<h1[^>]*>([\s\S]*?)<\/h1>/gi;
   const h1Tags: string[] = [];
   let h1Match;
   while ((h1Match = h1Regex.exec(html)) !== null && h1Tags.length < 5) {
-    const cleanH1 = h1Match[1].replace(/<[^>]*>/g, '').trim();
-    if (cleanH1) h1Tags.push(cleanH1);
+    const cleanH1 = decodeHtmlEntities(h1Match[1].replace(/<[^>]*>/g, ''));
+    h1Tags.push(cleanH1);
   }
 
-  // H2 and H3 Counts
+  // H2 and H3 Tags
+  const h2Regex = /<h2[^>]*>([\s\S]*?)<\/h2>/gi;
+  const h2Tags: string[] = [];
+  let h2Match;
+  while ((h2Match = h2Regex.exec(html)) !== null && h2Tags.length < 15) {
+    const cleanH2 = decodeHtmlEntities(h2Match[1].replace(/<[^>]*>/g, ''));
+    if (cleanH2 && !h2Tags.includes(cleanH2)) {
+      h2Tags.push(cleanH2);
+    }
+  }
   const h2Count = (html.match(/<h2[^>]*>/gi) || []).length;
   const h3Count = (html.match(/<h3[^>]*>/gi) || []).length;
 
-  // Images and Alt attributes
-  const imgTags = html.match(/<img[^>]*>/gi) || [];
-  const imagesTotal = imgTags.length;
+  // Open Graph & Social preview image
+  const ogImgMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+                     html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+  let ogImageUrl = ogImgMatch ? decodeHtmlEntities(ogImgMatch[1]) : undefined;
+  if (ogImageUrl && ogImageUrl.startsWith('//')) {
+    ogImageUrl = `https:${ogImageUrl}`;
+  } else if (ogImageUrl && ogImageUrl.startsWith('/')) {
+    ogImageUrl = new URL(ogImageUrl, targetUrl).href;
+  }
+
+  // Images and Alt attributes with visual flagging
+  const imgRegex = /<img[^>]+(?:src|data-manual-src|data-src)=["']([^"']+)["'][^>]*>/gi;
+  const flaggedImages: { src: string; tagSnippet: string; suggestedAlt?: string }[] = [];
+  let imagesTotal = 0;
   let imagesWithAlt = 0;
-  for (const img of imgTags) {
-    if (/alt=["'][^"']+["']/i.test(img)) {
+  let imgMatch;
+
+  while ((imgMatch = imgRegex.exec(html)) !== null) {
+    imagesTotal++;
+    const fullTag = imgMatch[0];
+    let src = decodeHtmlEntities(imgMatch[1]);
+
+    if (src.startsWith('//')) {
+      src = `https:${src}`;
+    } else if (src.startsWith('/')) {
+      try {
+        src = new URL(src, targetUrl).href;
+      } catch {
+        // keep relative if invalid URL
+      }
+    }
+
+    const hasAlt = /alt=["']([^"']*)["']/i.test(fullTag);
+    const altVal = hasAlt ? decodeHtmlEntities(fullTag.match(/alt=["']([^"']*)["']/i)?.[1] || '') : '';
+
+    if (hasAlt && altVal.length > 0) {
       imagesWithAlt++;
+    } else {
+      const alreadyFlagged = flaggedImages.some(f => f.src.split('?')[0] === src.split('?')[0]);
+      if (!alreadyFlagged && flaggedImages.length < 8 && !src.startsWith('data:') && (src.includes('.jpg') || src.includes('.png') || src.includes('.webp') || src.includes('.jpeg') || src.includes('cdn'))) {
+        // Generate a smart suggested alt text from filename
+        const rawFilename = src.split('/').pop()?.split('?')[0] || 'product graphic';
+        const cleanName = rawFilename
+          .replace(/\.(png|jpg|jpeg|webp|gif|svg)$/i, '')
+          .replace(/_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i, '')
+          .replace(/_\d+x\d+/i, '')
+          .replace(/[-_]+/g, ' ')
+          .trim();
+        const isReadable = /[a-zA-Z]{3,}/.test(cleanName);
+        flaggedImages.push({
+          src,
+          tagSnippet: fullTag.length > 130 ? `${fullTag.slice(0, 127)}...>` : fullTag,
+          suggestedAlt: isReadable ? cleanName : 'Descriptive product or lifestyle image alt text',
+        });
+      }
     }
   }
+
   const imagesMissingAlt = Math.max(0, imagesTotal - imagesWithAlt);
+  const encodedTarget = encodeURIComponent(targetUrl);
+  const screenshotUrl = `https://api.microlink.io/?url=${encodedTarget}&screenshot=true&meta=false&embed=screenshot.url`;
+  const mobileScreenshotUrl = `https://api.microlink.io/?url=${encodedTarget}&screenshot=true&viewport.width=390&viewport.height=844&viewport.isMobile=true&meta=false&embed=screenshot.url`;
+
+  // Canonical URL
+  const canonicalMatch = html.match(/<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i) ||
+                         html.match(/<link[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["']/i);
+  const canonicalUrl = canonicalMatch ? canonicalMatch[1].trim() : undefined;
+
+  // Schema.org / JSON-LD Structured Data
+  const schemaTypes: string[] = [];
+  const jsonLdRegex = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let jsonLdMatch;
+  while ((jsonLdMatch = jsonLdRegex.exec(html)) !== null) {
+    const rawJson = jsonLdMatch[1];
+    const typeMatches = rawJson.match(/"@type"\s*:\s*"([^"]+)"/g) || [];
+    for (const tm of typeMatches) {
+      const tVal = tm.replace(/"@type"\s*:\s*"/, '').replace(/"$/, '').trim();
+      if (tVal && !schemaTypes.includes(tVal)) {
+        schemaTypes.push(tVal);
+      }
+    }
+  }
+  const hasSchemaOrg = schemaTypes.length > 0 || /itemtype=["']https?:\/\/schema\.org/i.test(html);
+
+  // Analytics & Marketing Pixels
+  const hasAnalyticsOrPixels: string[] = [];
+  if (/googletagmanager\.com|gtag\(|G-[A-Z0-9]+|UA-\d+/i.test(html)) hasAnalyticsOrPixels.push('Google Analytics / GTM');
+  if (/connect\.facebook\.net|fbq\(/i.test(html)) hasAnalyticsOrPixels.push('Meta Pixel');
+  if (/klaviyo/i.test(html)) hasAnalyticsOrPixels.push('Klaviyo');
+  if (/hotjar/i.test(html)) hasAnalyticsOrPixels.push('Hotjar');
+  if (/clarity\.ms/i.test(html)) hasAnalyticsOrPixels.push('Microsoft Clarity');
+  if (/shopify/i.test(html)) hasAnalyticsOrPixels.push('Shopify Commerce');
+  if (/hubspot/i.test(html)) hasAnalyticsOrPixels.push('HubSpot');
+  if (/tiktok/i.test(html) && /analytics|pixel/i.test(html)) hasAnalyticsOrPixels.push('TikTok Pixel');
+
+  // Scripts & Stylesheets count
+  const scriptsCount = (html.match(/<script[^>]*src=/gi) || []).length;
+  const stylesheetsCount = (html.match(/<link[^>]*rel=["']stylesheet["']/gi) || []).length;
 
   // Links
   const linkMatches = html.match(/<a[^>]*href=["']([^"']*)["']/gi) || [];
@@ -196,13 +308,18 @@ export async function inspectWebsite(rawUrl: string): Promise<WebsiteMeasuredDat
   const hasEmail = /mailto:|[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}/i.test(html);
   const hasContactForm = /<form[^>]*>/i.test(html) && /submit|message|email|contact/i.test(html);
 
-  // CTA Buttons
-  const buttonMatches = html.match(/<(button|a)[^>]*class=["'][^"']*(?:btn|cta|button)[^"']*["'][^>]*>([\s\S]*?)<\/\1>/gi) || [];
+  // CTA Buttons - check classes and common interactive elements
+  const buttonMatches = html.match(/<(button|a)[^>]*>([\s\S]*?)<\/\1>/gi) || [];
   const ctaButtonTexts: string[] = [];
-  for (const btn of buttonMatches.slice(0, 5)) {
-    const text = btn.replace(/<[^>]*>/g, '').trim();
-    if (text && text.length < 40 && !ctaButtonTexts.includes(text)) {
+  const ctaKeywords = /shop|buy|cart|book|schedule|get|start|free|contact|demo|quote|join|subscribe|order|explore|discover|learn more|sign up|add to|try|call|audit/i;
+  for (const btn of buttonMatches) {
+    const isBtnTag = /^<button/i.test(btn);
+    const hasBtnClass = /class=["'][^"']*(?:btn|cta|button|primary|action|submit)[^"']*["']/i.test(btn);
+    const text = btn.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    if (!text || text.length < 2 || text.length > 36) continue;
+    if ((isBtnTag || hasBtnClass || ctaKeywords.test(text)) && !ctaButtonTexts.includes(text)) {
       ctaButtonTexts.push(text);
+      if (ctaButtonTexts.length >= 8) break;
     }
   }
 
@@ -235,6 +352,9 @@ export async function inspectWebsite(rawUrl: string): Promise<WebsiteMeasuredDat
   return {
     url: rawUrl,
     normalizedUrl: targetUrl,
+    screenshotUrl,
+    mobileScreenshotUrl,
+    ogImageUrl,
     isAccessible,
     httpStatus,
     responseTimeMs,
@@ -243,12 +363,20 @@ export async function inspectWebsite(rawUrl: string): Promise<WebsiteMeasuredDat
     titleLength: title?.length,
     metaDescription,
     metaDescriptionLength: metaDescription?.length,
+    canonicalUrl,
+    hasSchemaOrg,
+    schemaTypes,
+    hasAnalyticsOrPixels,
+    scriptsCount,
+    stylesheetsCount,
     h1Tags,
+    h2Tags,
     h2TagsCount: h2Count,
     h3TagsCount: h3Count,
     imagesTotal,
     imagesWithAlt,
     imagesMissingAlt,
+    flaggedImages,
     internalLinksCount,
     externalLinksCount,
     hasViewportMeta,

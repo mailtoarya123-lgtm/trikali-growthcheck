@@ -194,6 +194,9 @@ const seedAudit: AuditReport = {
   measuredData: {
     url: 'https://trikali.com',
     normalizedUrl: 'https://trikali.com',
+    screenshotUrl: 'https://api.microlink.io/?url=https%3A%2F%2Ftrikali.com&screenshot=true&meta=false&embed=screenshot.url',
+    mobileScreenshotUrl: 'https://api.microlink.io/?url=https%3A%2F%2Ftrikali.com&screenshot=true&viewport.width=390&viewport.height=844&viewport.isMobile=true&meta=false&embed=screenshot.url',
+    ogImageUrl: 'https://trikali.com/assets/img/og-preview.jpg',
     isAccessible: true,
     httpStatus: 200,
     responseTimeMs: 382,
@@ -202,12 +205,31 @@ const seedAudit: AuditReport = {
     titleLength: 61,
     metaDescription: 'Accelerate digital performance, SEO visibility, and qualified pipeline conversion with Trikali growth marketing solutions.',
     metaDescriptionLength: 122,
+    canonicalUrl: 'https://trikali.com/',
+    hasSchemaOrg: true,
+    schemaTypes: ['Organization', 'WebSite', 'ProfessionalService'],
+    hasAnalyticsOrPixels: ['Google Analytics / GTM', 'Meta Pixel'],
+    scriptsCount: 6,
+    stylesheetsCount: 3,
     h1Tags: ['Accelerate Your Business With High-Performance Digital Marketing'],
+    h2Tags: ['Growth Strategy', 'SEO & Performance Marketing', 'Conversion Optimization', 'Web Design & Development'],
     h2TagsCount: 8,
     h3TagsCount: 14,
     imagesTotal: 22,
     imagesWithAlt: 18,
     imagesMissingAlt: 4,
+    flaggedImages: [
+      {
+        src: 'https://trikali.com/assets/img/hero-mockup.png',
+        tagSnippet: '<img src="/assets/img/hero-mockup.png" class="hero-img">',
+        suggestedAlt: 'Marketing Growth Dashboard preview'
+      },
+      {
+        src: 'https://trikali.com/assets/img/client-case-study.jpg',
+        tagSnippet: '<img src="/assets/img/client-case-study.jpg" class="case-img">',
+        suggestedAlt: 'Client e-commerce revenue growth chart'
+      }
+    ],
     internalLinksCount: 32,
     externalLinksCount: 9,
     hasViewportMeta: true,
