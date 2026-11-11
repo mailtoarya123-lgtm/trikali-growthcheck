@@ -175,58 +175,36 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
 
   return (
     <div className="min-h-screen bg-[#161616] text-[#FAF7F6] pb-28">
-      {/* Sticky Top Action & Section Jump Bar */}
-      <div className="bg-[#1C1C1C]/90 border-b border-white/[0.08] sticky top-20 z-40 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#DDF160] text-[#161616] flex items-center justify-center font-display font-black text-sm shadow-sm">
+      {/* Sticky Top Action Bar */}
+      <div className="bg-[#1C1C1C]/95 border-b border-white/[0.08] sticky top-20 z-40 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-[#DDF160] text-[#161616] flex items-center justify-center font-display font-black text-sm shadow-sm shrink-0">
               {report.scores.overall}
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-display font-bold text-sm text-white">{report.businessName}</h1>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-display font-bold text-sm text-white truncate">{report.businessName}</h1>
                 <span className="text-xs text-[#737373]">•</span>
                 <a
                   href={report.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-[#DDF160] hover:underline flex items-center gap-0.5 font-medium"
+                  className="text-xs text-[#DDF160] hover:underline flex items-center gap-0.5 font-medium truncate"
                 >
-                  {cleanDomain} <ArrowUpRight className="w-3 h-3" />
+                  {cleanDomain} <ArrowUpRight className="w-3 h-3 shrink-0" />
                 </a>
               </div>
-              <p className="text-[11px] text-[#838383]">
+              <p className="text-[11px] text-[#838383] truncate">
                 {report.industry} • Audited {new Date(report.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
 
-          {/* Quick Jump Anchors (Scroll Navigation) */}
-          <nav aria-label="Report Section Shortcuts" className="hidden xl:flex items-center gap-1 bg-black/40 p-1 rounded-full border border-white/10 text-[11px] font-semibold text-[#ACACAC]">
-            <a href="#section-overview" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
-              Scorecard
-            </a>
-            <a href="#section-visual" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
-              Annotated Screenshots
-            </a>
-            <a href="#section-images" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
-              Image Inspector ({report.measuredData.flaggedImages?.length || 0})
-            </a>
-            <a href="#section-opportunities" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
-              Leaks &amp; Growth
-            </a>
-            <a href="#section-recommendations" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
-              Fixes ({report.recommendations.length})
-            </a>
-            <a href="#section-roadmap" className="px-3 py-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all">
-              30-Day Plan
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={handleShare}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition-all"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition-all whitespace-nowrap"
             >
               {copiedLink ? <Check className="w-3.5 h-3.5 text-[#DDF160]" /> : <Share2 className="w-3.5 h-3.5" />}
               {copiedLink ? 'Link Copied' : 'Share Link'}
@@ -235,10 +213,10 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
             <button
               onClick={handleDownloadPDF}
               disabled={isExporting}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold shadow-md transition-all disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold shadow-md transition-all disabled:opacity-60 whitespace-nowrap"
             >
               {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-              {isExporting ? 'Generating PDF...' : 'Download Full PDF'}
+              {isExporting ? 'Generating PDF...' : 'Download PDF'}
             </button>
           </div>
         </div>
