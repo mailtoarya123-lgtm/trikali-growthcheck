@@ -46,9 +46,14 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
     return 'text-red-400 border-red-400/40 bg-red-400/10';
   };
 
+  const getScoreStrokeHex = (score: number) => {
+    if (score >= 60) return '#DDF160';
+    if (score >= 45) return '#FBBF24';
+    return '#F87171';
+  };
+
   const getScoreBarColor = (score: number) => {
-    if (score >= 80) return 'bg-[#DDF160]';
-    if (score >= 60) return 'bg-emerald-400';
+    if (score >= 60) return 'bg-[#DDF160]';
     if (score >= 45) return 'bg-amber-400';
     return 'bg-red-400';
   };
@@ -232,16 +237,54 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
           <div className="bg-[#1C1C1C] rounded-[2.5rem] border border-white/10 p-6 sm:p-10 shadow-2xl space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
               
-              {/* Left Score Gauge (4 cols) */}
+              {/* Left Progressive Circular Score Gauge (4 cols) */}
               <div className="lg:col-span-4 flex flex-col items-center justify-center text-center p-8 rounded-[2rem] bg-black/40 border border-white/10 relative overflow-hidden">
-                <span className="text-[11px] font-bold text-[#838383] uppercase tracking-widest mb-3">
+                <span className="text-[11px] font-bold text-[#838383] uppercase tracking-widest mb-4">
                   Overall Growth Score
                 </span>
-                <div className={`w-36 h-36 rounded-full border-8 flex flex-col items-center justify-center ${getScoreColor(report.scores.overall)}`}>
-                  <span className="font-display text-5xl font-black tracking-tight">{report.scores.overall}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383]">out of 100</span>
+
+                {/* Progressive SVG Ring */}
+                <div className="relative w-44 h-44 flex items-center justify-center">
+                  <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 160 160">
+                    {/* Background Track Circle */}
+                    <circle
+                      cx="80"
+                      cy="80"
+                      r="66"
+                      fill="transparent"
+                      stroke="rgba(255, 255, 255, 0.08)"
+                      strokeWidth="12"
+                    />
+                    {/* Progressive Value Arc */}
+                    <circle
+                      cx="80"
+                      cy="80"
+                      r="66"
+                      fill="transparent"
+                      stroke={getScoreStrokeHex(report.scores.overall)}
+                      strokeWidth="12"
+                      strokeLinecap="round"
+                      strokeDasharray={2 * Math.PI * 66}
+                      strokeDashoffset={
+                        2 * Math.PI * 66 * (1 - Math.min(100, Math.max(0, report.scores.overall)) / 100)
+                      }
+                      style={{
+                        filter: `drop-shadow(0 0 10px ${getScoreStrokeHex(report.scores.overall)}45)`,
+                        transition: 'stroke-dashoffset 0.8s ease-out',
+                      }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="font-display text-5xl font-black tracking-tight text-white">
+                      {report.scores.overall}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383] mt-0.5">
+                      out of 100
+                    </span>
+                  </div>
                 </div>
-                <span className="mt-4 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white">
+
+                <span className="mt-4 px-3.5 py-1 rounded-full bg-[#DDF160]/10 border border-[#DDF160]/30 text-xs font-bold text-[#DDF160]">
                   {getScoreLabel(report.scores.overall)}
                 </span>
                 <div className="mt-3 flex items-center gap-1.5 text-[11px] text-[#ACACAC]">

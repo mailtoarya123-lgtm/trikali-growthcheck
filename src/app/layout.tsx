@@ -8,7 +8,11 @@ export const metadata: Metadata = {
   description: 'AI-powered marketing audits for ambitious brands. Discover practical ways to improve your website, SEO, content, and customer acquisition.',
   metadataBase: new URL('https://growthcheck.trikali.com'),
   icons: {
-    icon: '/icon-trikali.png',
+    icon: [
+      { url: '/icon-trikali.png?v=2', type: 'image/png' },
+    ],
+    shortcut: '/icon-trikali.png?v=2',
+    apple: '/icon-trikali.png?v=2',
   },
   openGraph: {
     title: 'Trikali GrowthCheck — AI Marketing Audit Platform',
