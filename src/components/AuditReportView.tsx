@@ -180,60 +180,13 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
 
   return (
     <div className="min-h-screen bg-[#161616] text-[#FAF7F6] pb-28">
-      {/* Sticky Top Action Bar */}
-      <div className="bg-[#1C1C1C]/95 border-b border-white/[0.08] sticky top-20 z-40 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-[#DDF160] text-[#161616] flex items-center justify-center font-display font-black text-sm shadow-sm shrink-0">
-              {report.scores.overall}
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-display font-bold text-sm text-white truncate">{report.businessName}</h1>
-                <span className="text-xs text-[#737373]">•</span>
-                <a
-                  href={report.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-[#DDF160] hover:underline flex items-center gap-0.5 font-medium truncate"
-                >
-                  {cleanDomain} <ArrowUpRight className="w-3 h-3 shrink-0" />
-                </a>
-              </div>
-              <p className="text-[11px] text-[#838383] truncate">
-                {report.industry} • Audited {new Date(report.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={handleShare}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition-all whitespace-nowrap"
-            >
-              {copiedLink ? <Check className="w-3.5 h-3.5 text-[#DDF160]" /> : <Share2 className="w-3.5 h-3.5" />}
-              {copiedLink ? 'Link Copied' : 'Share Link'}
-            </button>
-
-            <button
-              onClick={handleDownloadPDF}
-              disabled={isExporting}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold shadow-md transition-all disabled:opacity-60 whitespace-nowrap"
-            >
-              {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-              {isExporting ? 'Generating PDF...' : 'Download PDF'}
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Main Single-Scroll Report Container */}
-      <div id="report-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-14">
+      <div id="report-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 space-y-14">
         
         {/* =====================================================================
             SECTION 1: EXECUTIVE SCORECARD & 5-PILLAR DIAGNOSTIC BREAKDOWN
         ===================================================================== */}
-        <section id="section-overview" className="scroll-mt-36 space-y-6">
+        <section id="section-overview" className="scroll-mt-28 space-y-6">
           <div className="bg-[#1C1C1C] rounded-[2.5rem] border border-white/10 p-6 sm:p-10 shadow-2xl space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
               
@@ -295,18 +248,49 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
 
               {/* Right Executive Summary (8 cols) */}
               <div className="lg:col-span-8 flex flex-col justify-between space-y-5">
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DDF160]/10 text-[#DDF160] text-xs font-bold border border-[#DDF160]/25">
-                      <Sparkles className="w-3.5 h-3.5" /> Executive Summary
-                    </span>
-                    <span className="text-xs text-[#838383] font-mono">
-                      {report.measuredData.responseTimeMs}ms TTFB • {report.measuredData.pageSizeKb} KB • {report.measuredData.contentWordCount} words
-                    </span>
+                <div className="space-y-4">
+                  {/* Top Bar Inside Card: Executive Pill + Website Link on Left, Share & Download PDF on Right */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DDF160]/10 text-[#DDF160] text-xs font-bold border border-[#DDF160]/25">
+                        <Sparkles className="w-3.5 h-3.5" /> Executive Summary
+                      </span>
+                      <a
+                        href={report.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-[#DDF160] font-semibold transition-all"
+                      >
+                        {cleanDomain} <ArrowUpRight className="w-3 h-3" />
+                      </a>
+                      <span className="text-xs text-[#838383]">
+                        {report.industry} • {new Date(report.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <button
+                        onClick={handleShare}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition-all whitespace-nowrap"
+                      >
+                        {copiedLink ? <Check className="w-3.5 h-3.5 text-[#DDF160]" /> : <Share2 className="w-3.5 h-3.5" />}
+                        {copiedLink ? 'Link Copied' : 'Share Link'}
+                      </button>
+
+                      <button
+                        onClick={handleDownloadPDF}
+                        disabled={isExporting}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold shadow-md transition-all disabled:opacity-60 whitespace-nowrap"
+                      >
+                        {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+                        {isExporting ? 'Generating PDF...' : 'Download PDF'}
+                      </button>
+                    </div>
                   </div>
-                  <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+
+                  <h1 className="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
                     Audit Findings for {report.businessName}
-                  </h2>
+                  </h1>
                   <p className="text-sm text-[#ACACAC] leading-relaxed">
                     {report.executiveSummary}
                   </p>
