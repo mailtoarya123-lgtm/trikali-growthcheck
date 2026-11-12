@@ -547,9 +547,12 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                     </div>
                   )}
 
-                  {/* Subtle dark vignette when pointers are active so callouts pop clearly */}
+                  {/* Deep top/bottom shade vignette + overall dim when pointers are active so callout pills pop clearly */}
                   {showPointers && (
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/65 pointer-events-none" />
+                    <>
+                      <div className="absolute inset-0 bg-black/45 pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/25 to-black/90 pointer-events-none" />
+                    </>
                   )}
 
                   {/* POINTER OVERLAYS ON DESKTOP SCREENSHOT */}
@@ -557,14 +560,14 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                     <div className="absolute inset-0 pointer-events-none">
                       
                       {/* PIN #1: Top-Left Header / H1 Heading Callout */}
-                      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-start gap-2 sm:gap-2.5 max-w-[200px] sm:max-w-[330px]">
+                      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-start gap-2 sm:gap-2.5 max-w-[190px] sm:max-w-[290px]">
                         <div className="relative flex items-center justify-center shrink-0 mt-0.5 sm:mt-1">
                           <span className={`animate-ping absolute inline-flex h-6 w-6 sm:h-7 sm:w-7 rounded-full opacity-60 ${hasH1Issue ? 'bg-red-500' : 'bg-[#DDF160]'}`} />
                           <span className={`relative w-6 h-6 sm:w-7 sm:h-7 rounded-full font-display font-black text-[11px] sm:text-xs flex items-center justify-center shadow-lg border-2 border-black ${hasH1Issue ? 'bg-red-500 text-white' : 'bg-[#DDF160] text-[#161616]'}`}>
                             1
                           </span>
                         </div>
-                        <div className={`bg-black/90 backdrop-blur-md rounded-xl p-2 sm:p-3 border shadow-2xl ${hasH1Issue ? 'border-red-500/60' : 'border-[#DDF160]/60'}`}>
+                        <div className={`bg-[#0B0B0B]/95 backdrop-blur-xl rounded-xl p-2.5 sm:p-3 border shadow-[0_12px_32px_rgba(0,0,0,0.95)] ${hasH1Issue ? 'border-red-500/80' : 'border-[#DDF160]/80'}`}>
                           <span className={`text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1 ${hasH1Issue ? 'text-red-400' : 'text-[#DDF160]'}`}>
                             <AlertTriangle className="w-3 h-3 shrink-0" />
                             {report.measuredData.h1Tags.length === 0
@@ -582,14 +585,14 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                       </div>
 
                       {/* PIN #2: Top-Right Media & Image Alt Leak Callout */}
-                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-start gap-2 sm:gap-2.5 max-w-[160px] sm:max-w-[290px]">
-                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-2 sm:p-3 border border-amber-400/60 shadow-2xl text-right">
+                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-start gap-2 sm:gap-2.5 max-w-[170px] sm:max-w-[270px]">
+                        <div className="bg-[#0B0B0B]/95 backdrop-blur-xl rounded-xl p-2.5 sm:p-3 border border-amber-400/80 shadow-[0_12px_32px_rgba(0,0,0,0.95)] text-right">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center justify-end gap-1">
                             <ImageIcon className="w-3 h-3 shrink-0" />
                             {report.measuredData.imagesMissingAlt} Unindexed Images
                           </span>
-                          <p className="hidden sm:block text-[11px] text-[#ACACAC] mt-1 leading-snug">
-                            {report.measuredData.imagesMissingAlt} of {report.measuredData.imagesTotal} page visuals have missing or generic <code className="text-white">alt</code> text ({report.measuredData.pageSizeKb} KB HTML).
+                          <p className="hidden sm:block text-[11px] text-white/90 mt-1 leading-snug">
+                            {report.measuredData.imagesMissingAlt} of {report.measuredData.imagesTotal} page visuals have missing or generic <code className="text-amber-300">alt</code> text ({report.measuredData.pageSizeKb} KB HTML).
                           </p>
                         </div>
                         <div className="relative flex items-center justify-center shrink-0 mt-0.5 sm:mt-1">
@@ -601,19 +604,19 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                       </div>
 
                       {/* PIN #3: Bottom-Left Above-the-Fold CTA & Conversion Zone */}
-                      <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 flex items-end gap-2 sm:gap-2.5 max-w-[210px] sm:max-w-[320px]">
+                      <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 flex items-end gap-2 sm:gap-2.5 max-w-[200px] sm:max-w-[280px]">
                         <div className="relative flex items-center justify-center shrink-0 mb-0.5 sm:mb-1">
                           <span className="animate-ping absolute inline-flex h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-[#DDF160] opacity-60" />
                           <span className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#DDF160] text-[#161616] font-display font-black text-[11px] sm:text-xs flex items-center justify-center shadow-lg border-2 border-black">
                             3
                           </span>
                         </div>
-                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-2 sm:p-3 border border-[#DDF160]/60 shadow-2xl">
+                        <div className="bg-[#0B0B0B]/95 backdrop-blur-xl rounded-xl p-2.5 sm:p-3 border border-[#DDF160]/80 shadow-[0_12px_32px_rgba(0,0,0,0.95)] min-w-0">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#DDF160] flex items-center gap-1">
                             <MousePointerClick className="w-3 h-3 shrink-0" />
                             Hero CTA ({report.measuredData.ctaButtonTexts.length} Buttons)
                           </span>
-                          <p className="hidden sm:block text-[11px] text-white mt-1 truncate">
+                          <p className="hidden sm:block text-[11px] text-white mt-1 line-clamp-2 leading-snug">
                             {report.measuredData.ctaButtonTexts.length > 0
                               ? `Detected: ${report.measuredData.ctaButtonTexts.slice(0, 3).map(c => `"${c}"`).join(', ')}`
                               : 'No high-contrast primary conversion button detected above fold'}
@@ -622,13 +625,13 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                       </div>
 
                       {/* PIN #4: Bottom-Right Pixel & Schema Telemetry */}
-                      <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 hidden md:flex items-end gap-2.5 max-w-[290px]">
-                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-3 border border-white/30 shadow-2xl text-right">
+                      <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 hidden md:flex items-end gap-2.5 max-w-[270px]">
+                        <div className="bg-[#0B0B0B]/95 backdrop-blur-xl rounded-xl p-2.5 sm:p-3 border border-white/50 shadow-[0_12px_32px_rgba(0,0,0,0.95)] text-right min-w-0">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-white flex items-center justify-end gap-1">
                             <Activity className="w-3 h-3 text-[#DDF160] shrink-0" />
-                            Pointing Out: Tracking &amp; Schema Layer
+                            Tracking &amp; Schema Layer
                           </span>
-                          <p className="text-[11px] text-[#ACACAC] mt-1 truncate">
+                          <p className="text-[11px] text-white/90 mt-1 line-clamp-2 leading-snug">
                             {report.measuredData.hasAnalyticsOrPixels?.length
                               ? `Active: ${report.measuredData.hasAnalyticsOrPixels.join(', ')}`
                               : 'Warning: No remarketing or analytics pixels found'}
@@ -716,17 +719,17 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                   )}
 
                   {showPointers && (
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/75 pointer-events-none p-3 flex flex-col justify-between">
+                    <div className="absolute inset-0 bg-black/40 bg-gradient-to-b from-black/85 via-black/25 to-black/90 pointer-events-none p-3 flex flex-col justify-between">
                       {/* Pin #5: Mobile Viewport & Render Blocking */}
                       <div className="flex items-start gap-2">
                         <span className="w-6 h-6 rounded-full bg-[#DDF160] text-[#161616] font-display font-black text-xs flex items-center justify-center shrink-0 shadow-lg border border-black">
                           5
                         </span>
-                        <div className="bg-black/90 backdrop-blur-md border border-[#DDF160]/50 rounded-xl p-2 text-[10px]">
+                        <div className="bg-[#0B0B0B]/95 backdrop-blur-xl border border-[#DDF160]/80 rounded-xl p-2.5 text-[10px] shadow-[0_10px_28px_rgba(0,0,0,0.95)]">
                           <span className="font-bold text-[#DDF160] block">
                             Mobile Render ({report.measuredData.scriptsCount || 0} JS Scripts)
                           </span>
-                          <span className="text-[#ACACAC]">
+                          <span className="text-white/90">
                             {report.measuredData.responseTimeMs}ms initial server response on cellular
                           </span>
                         </div>
@@ -737,11 +740,11 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                         <span className="w-6 h-6 rounded-full bg-amber-400 text-[#161616] font-display font-black text-xs flex items-center justify-center shrink-0 shadow-lg border border-black">
                           6
                         </span>
-                        <div className="bg-black/90 backdrop-blur-md border border-amber-400/50 rounded-xl p-2 text-[10px]">
+                        <div className="bg-[#0B0B0B]/95 backdrop-blur-xl border border-amber-400/80 rounded-xl p-2.5 text-[10px] shadow-[0_10px_28px_rgba(0,0,0,0.95)]">
                           <span className="font-bold text-amber-300 block">
                             Mobile Thumb-Zone Conversion
                           </span>
-                          <span className="text-[#ACACAC]">
+                          <span className="text-white/90">
                             {report.measuredData.detectedContactMethods.hasContactForm
                               ? 'Form detected — simplify fields for mobile tap completion'
                               : 'Add sticky bottom mobile CTA bar for 1-tap booking'}
