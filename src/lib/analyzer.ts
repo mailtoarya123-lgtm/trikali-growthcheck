@@ -218,7 +218,7 @@ export async function inspectWebsite(rawUrl: string): Promise<WebsiteMeasuredDat
     }
 
     const alreadyFlagged = flaggedImages.some(f => f.src.split('?')[0] === src.split('?')[0]);
-    if (!alreadyFlagged && flaggedImages.length < 8 && !src.startsWith('data:')) {
+    if (!alreadyFlagged && flaggedImages.length < 6 && !src.startsWith('data:')) {
       const rawFilename = src.split('/').pop()?.split('?')[0] || 'brand-visual';
       const cleanName = rawFilename
         .replace(/\.(png|jpg|jpeg|webp|gif|svg)$/i, '')

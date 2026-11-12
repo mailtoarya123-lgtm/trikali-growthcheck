@@ -344,7 +344,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                   return (
                     <div
                       key={pillar.key}
-                      className="p-5 rounded-2xl bg-black/35 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between space-y-4"
+                      className="p-5 rounded-2xl bg-black/35 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-start space-y-3.5"
                     >
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -362,7 +362,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                           />
                         </div>
                       </div>
-                      <p className="text-[11px] text-[#ACACAC] leading-relaxed">
+                      <p className="text-[11px] text-[#ACACAC] leading-relaxed line-clamp-5">
                         {pillar.summary}
                       </p>
                     </div>
@@ -673,9 +673,9 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
           </div>
 
           {/* Google Search (SERP) Simulator + OpenGraph Social Share Card Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Google SERP Preview with Pointed-Out Length Diagnostics */}
-            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 space-y-5 flex flex-col justify-between">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+            {/* Google SERP Preview with Pointed-Out Length Diagnostics & Pixels */}
+            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 space-y-4 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-2">
                   <div>
@@ -683,7 +683,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                       <Globe className="w-3.5 h-3.5" /> Google Search Result Preview
                     </span>
                     <h3 className="font-display font-bold text-lg text-white mt-0.5">
-                      How {report.businessName} Appears on Google SERPs
+                      How {report.businessName} Appears on Google
                     </h3>
                   </div>
                   <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[#ACACAC]">
@@ -709,47 +709,78 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                     {report.measuredData.metaDescription || 'No meta description tag detected. Google will scrape random page fragments instead of a high-converting marketing hook.'}
                   </p>
                 </div>
+
+                {/* Pointing-Out Callouts for Title & Meta */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className={`p-3.5 rounded-xl border ${
+                    report.measuredData.titleLength && report.measuredData.titleLength >= 30 && report.measuredData.titleLength <= 65
+                      ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
+                      : 'bg-amber-950/20 border-amber-500/30 text-amber-300'
+                  }`}>
+                    <span className="font-bold block">
+                      Title Tag: {report.measuredData.titleLength || 0} chars
+                    </span>
+                    <span className="text-[11px] opacity-85">
+                      {(report.measuredData.titleLength || 0) === 0
+                        ? 'Missing <title> tag hurts ranking'
+                        : (report.measuredData.titleLength || 0) > 65
+                        ? 'Truncated in Google SERPs (>60 chars)'
+                        : 'Optimal 50–60 char length'}
+                    </span>
+                  </div>
+                  <div className={`p-3.5 rounded-xl border ${
+                    report.measuredData.metaDescriptionLength && report.measuredData.metaDescriptionLength >= 110 && report.measuredData.metaDescriptionLength <= 165
+                      ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
+                      : 'bg-red-950/20 border-red-500/30 text-red-300'
+                  }`}>
+                    <span className="font-bold block">
+                      Meta Description: {report.measuredData.metaDescriptionLength || 0} chars
+                    </span>
+                    <span className="text-[11px] opacity-85">
+                      {(report.measuredData.metaDescriptionLength || 0) === 0
+                        ? 'Missing description lowers organic CTR'
+                        : (report.measuredData.metaDescriptionLength || 0) > 165
+                        ? 'Cut off with ellipsis (>160 chars)'
+                        : 'Optimal 120–160 char hook'}
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              {/* Pointing-Out Callouts for Title & Meta */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className={`p-3.5 rounded-xl border ${
-                  report.measuredData.titleLength && report.measuredData.titleLength >= 30 && report.measuredData.titleLength <= 65
-                    ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
-                    : 'bg-amber-950/20 border-amber-500/30 text-amber-300'
-                }`}>
-                  <span className="font-bold block">
-                    Pointing Out Title: {report.measuredData.titleLength || 0} chars
-                  </span>
-                  <span className="text-[11px] opacity-85">
-                    {(report.measuredData.titleLength || 0) === 0
-                      ? 'Missing <title> tag hurts ranking'
-                      : (report.measuredData.titleLength || 0) > 65
-                      ? 'Truncated in Google SERPs (>60 chars)'
-                      : 'Optimal 50–60 char length'}
-                  </span>
-                </div>
-                <div className={`p-3.5 rounded-xl border ${
-                  report.measuredData.metaDescriptionLength && report.measuredData.metaDescriptionLength >= 110 && report.measuredData.metaDescriptionLength <= 165
-                    ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
-                    : 'bg-red-950/20 border-red-500/30 text-red-300'
-                }`}>
-                  <span className="font-bold block">
-                    Pointing Out Meta: {report.measuredData.metaDescriptionLength || 0} chars
-                  </span>
-                  <span className="text-[11px] opacity-85">
-                    {(report.measuredData.metaDescriptionLength || 0) === 0
-                      ? 'Missing description lowers organic CTR'
-                      : (report.measuredData.metaDescriptionLength || 0) > 165
-                      ? 'Cut off with ellipsis (>160 chars)'
-                      : 'Optimal 120–160 char hook'}
-                  </span>
+              {/* Detected Pixels & Schema Strip (Balances Left Card Height!) */}
+              <div className="pt-3 border-t border-white/[0.08] space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383] block">
+                  Detected Analytics, Pixels &amp; Structured Data
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {report.measuredData.hasAnalyticsOrPixels && report.measuredData.hasAnalyticsOrPixels.length > 0 ? (
+                    report.measuredData.hasAnalyticsOrPixels.map((px, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-lg bg-[#DDF160]/10 border border-[#DDF160]/30 text-[#DDF160] text-[11px] font-semibold">
+                        ✓ {px}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-[11px] font-semibold">
+                      ✗ No Marketing Pixels Detected
+                    </span>
+                  )}
+                  {report.measuredData.schemaTypes && report.measuredData.schemaTypes.length > 0 ? (
+                    report.measuredData.schemaTypes.slice(0, 3).map((sc, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/15 text-white text-[11px]">
+                        Schema: {sc}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px]">
+                      ✗ No JSON-LD Schema
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* OpenGraph Social Share Card Simulator */}
-            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 space-y-5 flex flex-col justify-between">
+            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-white/10 p-6 sm:p-8 space-y-4 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-2">
                   <div>
@@ -802,30 +833,34 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                 </div>
               </div>
 
-              {/* Detected Pixels & Schema Strip */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                {report.measuredData.hasAnalyticsOrPixels && report.measuredData.hasAnalyticsOrPixels.length > 0 ? (
-                  report.measuredData.hasAnalyticsOrPixels.map((px, i) => (
-                    <span key={i} className="px-2.5 py-1 rounded-lg bg-[#DDF160]/10 border border-[#DDF160]/30 text-[#DDF160] text-[11px] font-semibold">
-                      ✓ {px}
-                    </span>
-                  ))
-                ) : (
-                  <span className="px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-[11px] font-semibold">
-                    ✗ No Marketing Pixels Detected
+              {/* Social & Indexing Meta Status Footer */}
+              <div className="pt-3 border-t border-white/[0.08] space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383] block">
+                  Social &amp; Canonical Indexing Verification
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                  <span className={`px-2.5 py-1 rounded-lg border font-semibold ${
+                    report.measuredData.hasOpenGraph
+                      ? 'bg-[#DDF160]/10 border-[#DDF160]/30 text-[#DDF160]'
+                      : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  }`}>
+                    {report.measuredData.hasOpenGraph ? '✓ OpenGraph Tags' : '✗ Missing og:tags'}
                   </span>
-                )}
-                {report.measuredData.schemaTypes && report.measuredData.schemaTypes.length > 0 ? (
-                  report.measuredData.schemaTypes.slice(0, 3).map((sc, i) => (
-                    <span key={i} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/15 text-white text-[11px]">
-                      Schema: {sc}
-                    </span>
-                  ))
-                ) : (
-                  <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px]">
-                    ✗ No JSON-LD Schema
+                  <span className={`px-2.5 py-1 rounded-lg border font-semibold ${
+                    report.measuredData.hasTwitterCard
+                      ? 'bg-white/5 border-white/15 text-white'
+                      : 'bg-white/5 border-white/10 text-[#838383]'
+                  }`}>
+                    {report.measuredData.hasTwitterCard ? '✓ Twitter Card' : '○ Standard Card'}
                   </span>
-                )}
+                  <span className={`px-2.5 py-1 rounded-lg border font-semibold ${
+                    report.measuredData.canonicalUrl
+                      ? 'bg-[#DDF160]/10 border-[#DDF160]/30 text-[#DDF160]'
+                      : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  }`}>
+                    {report.measuredData.canonicalUrl ? '✓ Canonical URL' : '✗ Missing Canonical'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -837,35 +872,40 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
         <section id="section-images" className="scroll-mt-36 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 px-1">
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-red-400 flex items-center gap-1.5">
-                <ImageIcon className="w-3.5 h-3.5" /> Section 02 • Extracted Visual Assets &amp; Image SEO Inspector
+              <span className="text-xs font-bold uppercase tracking-widest text-amber-400 flex items-center gap-1.5">
+                <ImageIcon className="w-3.5 h-3.5" /> Section 02 • Visual Asset &amp; Image SEO Inspector
               </span>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
-                Page Images Pointing Out Alt-Text &amp; Core Web Vitals Issues ({report.measuredData.flaggedImages?.length || 0} Inspected)
+                Extracted Page Images &amp; Core Web Vitals Diagnostics
               </h2>
               <p className="text-xs text-[#838383] mt-1">
-                Live images extracted directly from {cleanDomain} showing exact HTML tag defects and copy-ready SEO fixes
+                Top {Math.min(6, report.measuredData.flaggedImages?.length || 0)} visuals extracted from {cleanDomain} with HTML tag diagnostics and copy-ready fixes
               </p>
             </div>
             <div className="flex items-center gap-2 self-start sm:self-auto">
               <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-white text-xs font-semibold">
                 {report.measuredData.imagesTotal} Total Page Images
               </span>
-              <span className="px-3.5 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold">
-                {report.measuredData.imagesMissingAlt} Need Optimization
+              <span className="px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold">
+                {report.measuredData.imagesMissingAlt > 0
+                  ? `${report.measuredData.imagesMissingAlt} Missing Alt`
+                  : `${Math.min(6, report.measuredData.flaggedImages?.length || 0)} CLS Dimension Checks`}
               </span>
             </div>
           </div>
 
           {report.measuredData.flaggedImages && report.measuredData.flaggedImages.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {report.measuredData.flaggedImages.map((img, i) => {
-                const suggestedAltText = `alt="${img.suggestedAlt || `${report.businessName} - ${report.industry}`}"`;
+              {report.measuredData.flaggedImages.slice(0, 6).map((img, i) => {
+                const isDimensionOnly = img.issueType === 'missing_dimensions';
+                const suggestedFixText = isDimensionOnly
+                  ? `width="800" height="600" loading="lazy"`
+                  : `alt="${img.suggestedAlt || `${report.businessName} - ${report.industry}`}"`;
                 const copyId = `alt-${i}`;
                 const badgeText =
                   img.issueType === 'generic_alt'
                     ? `Generic Alt ("${img.currentAlt}")`
-                    : img.issueType === 'missing_dimensions'
+                    : isDimensionOnly
                     ? 'Missing Width/Height (CLS)'
                     : 'Missing Alt Attribute';
 
@@ -875,17 +915,29 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                     className="rounded-[2rem] border border-white/10 bg-[#1C1C1C] overflow-hidden flex flex-col justify-between shadow-xl hover:border-[#DDF160]/40 transition-all"
                   >
                     <div>
-                      {/* Visual Image Preview Header with Pointing-Out Pin */}
-                      <div className="relative h-48 bg-black/90 border-b border-white/10 flex items-center justify-center p-3 overflow-hidden group">
+                      {/* Visual Image Preview Header with Blurred Backdrop & Pointing-Out Pin */}
+                      <div className="relative h-48 bg-[#0E0E0E] border-b border-white/10 flex items-center justify-center p-3 overflow-hidden group">
+                        {/* Ambient blurred background so square/portrait images have no harsh black sidebars */}
+                        <img
+                          src={img.src}
+                          alt=""
+                          aria-hidden="true"
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover blur-xl opacity-30 scale-110 pointer-events-none"
+                        />
                         <img
                           src={img.src}
                           alt={img.suggestedAlt || 'Inspected website asset'}
                           loading="lazy"
-                          className="max-h-full max-w-full object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
+                          className="relative z-10 max-h-full max-w-full object-contain rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
                         />
 
-                        {/* Numbered Point-Out Badge on Top-Left */}
-                        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600/95 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-lg">
+                        {/* Numbered Point-Out Badge on Top-Left (Amber for CLS/Generic, Red for Missing Alt) */}
+                        <div className={`z-20 absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider shadow-lg ${
+                          isDimensionOnly
+                            ? 'bg-amber-400 text-[#161616]'
+                            : 'bg-red-600/95 text-white'
+                        }`}>
                           <span>#{i + 1}</span>
                           <span>•</span>
                           <span>{badgeText}</span>
@@ -895,7 +947,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                           href={img.src}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/80 hover:bg-[#DDF160] text-white hover:text-[#161616] text-[10px] font-bold border border-white/20 transition-all flex items-center gap-1"
+                          className="z-20 absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/80 hover:bg-[#DDF160] text-white hover:text-[#161616] text-[10px] font-bold border border-white/20 hover:border-[#DDF160] transition-colors flex items-center gap-1"
                         >
                           Full Image <ArrowUpRight className="w-3 h-3" />
                         </a>
@@ -913,12 +965,18 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                         </div>
 
                         {/* Pointed-Out Issue Explanation */}
-                        <div className="p-2.5 rounded-xl bg-red-950/30 border border-red-500/25 space-y-1">
-                          <span className="text-[10px] font-bold text-red-300 uppercase tracking-wider flex items-center gap-1">
+                        <div className={`p-2.5 rounded-xl border space-y-1 ${
+                          isDimensionOnly
+                            ? 'bg-amber-950/25 border-amber-500/25'
+                            : 'bg-red-950/30 border-red-500/25'
+                        }`}>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
+                            isDimensionOnly ? 'text-amber-300' : 'text-red-300'
+                          }`}>
                             <AlertTriangle className="w-3 h-3 shrink-0" />
                             {img.issueLabel || 'Missing Descriptive Alt Attribute'}
                           </span>
-                          <code className="text-[10px] text-red-200/90 font-mono break-all line-clamp-2 block">
+                          <code className="text-[10px] text-white/80 font-mono break-all line-clamp-2 block">
                             {img.tagSnippet}
                           </code>
                         </div>
@@ -930,15 +988,15 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                       <div className="p-3 rounded-xl bg-[#DDF160]/10 border border-[#DDF160]/30 flex items-center justify-between gap-2">
                         <div className="min-w-0">
                           <span className="text-[10px] font-bold text-[#DDF160] uppercase tracking-wider block">
-                            Recommended SEO Fix:
+                            {isDimensionOnly ? 'Recommended CLS Fix:' : 'Recommended SEO Alt Fix:'}
                           </span>
                           <code className="text-[11px] text-white font-mono break-words line-clamp-2">
-                            {suggestedAltText}
+                            {suggestedFixText}
                           </code>
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleCopyText(suggestedAltText, copyId)}
+                          onClick={() => handleCopyText(suggestedFixText, copyId)}
                           className="px-3 py-1.5 rounded-lg bg-black/60 hover:bg-[#DDF160] text-[10px] font-bold text-[#DDF160] hover:text-[#161616] border border-[#DDF160]/30 hover:border-[#DDF160] shrink-0 flex items-center gap-1 transition-colors"
                         >
                           {copiedSnippet === copyId ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
@@ -977,53 +1035,69 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
           </div>
 
           {/* Critical Issues vs Identified Strengths */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-red-500/30 p-6 sm:p-8 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
-                    <XCircle className="w-4 h-4" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-red-500/30 p-6 sm:p-8 flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+                      <XCircle className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-display font-bold text-lg text-white">Critical Issues &amp; Funnel Leaks</h3>
                   </div>
-                  <h3 className="font-display font-bold text-lg text-white">Critical Issues &amp; Funnel Leaks</h3>
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-300 border border-red-500/25">
+                    {report.criticalIssues.length} Detected
+                  </span>
                 </div>
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-300 border border-red-500/25">
-                  {report.criticalIssues.length} Detected
-                </span>
+                <ul className="space-y-3 pt-1">
+                  {report.criticalIssues.map((issue, idx) => (
+                    <li key={idx} className="flex items-start gap-3 p-3.5 rounded-xl bg-black/35 border border-white/5 text-xs text-[#ACACAC]">
+                      <span className="w-5 h-5 rounded-full bg-red-500/15 text-red-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <span className="leading-relaxed text-white/90">{issue}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-3 pt-1">
-                {report.criticalIssues.map((issue, idx) => (
-                  <li key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-black/30 border border-white/5 text-xs text-[#ACACAC]">
-                    <span className="w-5 h-5 rounded-full bg-red-500/15 text-red-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                      {idx + 1}
-                    </span>
-                    <span className="leading-relaxed text-white/90">{issue}</span>
-                  </li>
-                ))}
-              </ul>
+
+              <div className="p-3.5 rounded-xl bg-red-950/20 border border-red-500/20 flex items-center justify-between gap-3 text-xs">
+                <span className="text-red-200/90 font-medium">
+                  Resolving these {report.criticalIssues.length} primary bottlenecks is the fastest path to lifting conversion velocity.
+                </span>
+                <a
+                  href="#section-recommendations"
+                  className="px-3 py-1.5 rounded-lg bg-red-500/15 hover:bg-[#DDF160] text-red-200 hover:text-[#161616] font-bold text-[11px] shrink-0 transition-colors"
+                >
+                  View Fixes →
+                </a>
+              </div>
             </div>
 
-            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-[#DDF160]/30 p-6 sm:p-8 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#DDF160]/10 border border-[#DDF160]/30 flex items-center justify-center text-[#DDF160]">
-                    <CheckCircle2 className="w-4 h-4" />
+            <div className="bg-[#1C1C1C] rounded-[2.2rem] border border-[#DDF160]/30 p-6 sm:p-8 flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-[#DDF160]/10 border border-[#DDF160]/30 flex items-center justify-center text-[#DDF160]">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-display font-bold text-lg text-white">Verified Foundation Strengths</h3>
                   </div>
-                  <h3 className="font-display font-bold text-lg text-white">Verified Foundation Strengths</h3>
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#DDF160]/10 text-[#DDF160] border border-[#DDF160]/25">
+                    {report.strengths.length} Verified
+                  </span>
                 </div>
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#DDF160]/10 text-[#DDF160] border border-[#DDF160]/25">
-                  {report.strengths.length} Verified
-                </span>
+                <ul className="space-y-3 pt-1">
+                  {report.strengths.map((str, idx) => (
+                    <li key={idx} className="flex items-start gap-3 p-3.5 rounded-xl bg-black/35 border border-white/5 text-xs text-[#ACACAC]">
+                      <span className="w-5 h-5 rounded-full bg-[#DDF160]/15 text-[#DDF160] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                        ✓
+                      </span>
+                      <span className="leading-relaxed text-white/90">{str}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-3 pt-1">
-                {report.strengths.map((str, idx) => (
-                  <li key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-black/30 border border-white/5 text-xs text-[#ACACAC]">
-                    <span className="w-5 h-5 rounded-full bg-[#DDF160]/15 text-[#DDF160] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                      ✓
-                    </span>
-                    <span className="leading-relaxed text-white/90">{str}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
 
@@ -1085,54 +1159,56 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
             {report.recommendations.map((rec, idx) => (
               <div
                 key={rec.id}
-                className="p-6 sm:p-8 rounded-[2rem] border border-white/10 bg-[#1C1C1C] hover:border-white/20 transition-all space-y-5"
+                className="p-6 sm:p-7 rounded-[2rem] border border-white/10 bg-[#1C1C1C] hover:border-white/20 transition-all flex flex-col justify-between space-y-4"
               >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    <span className="w-7 h-7 rounded-lg bg-white/10 text-white font-display font-bold text-xs flex items-center justify-center">
-                      #{idx + 1}
-                    </span>
-                    <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase border ${getPriorityBadge(rec.priority)}`}>
-                      {rec.priority} Priority
-                    </span>
-                    <span className="text-[11px] uppercase font-bold text-[#DDF160] bg-[#DDF160]/10 border border-[#DDF160]/25 px-3 py-1 rounded-full">
-                      {rec.category}
-                    </span>
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="w-7 h-7 rounded-lg bg-white/10 text-white font-display font-bold text-xs flex items-center justify-center">
+                        #{idx + 1}
+                      </span>
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${getPriorityBadge(rec.priority)}`}>
+                        {rec.priority} Priority
+                      </span>
+                      <span className="text-[10px] uppercase font-bold text-[#DDF160] bg-[#DDF160]/10 border border-[#DDF160]/25 px-2.5 py-1 rounded-full">
+                        {rec.category}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-[#838383] bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                      <span>Impact: <strong className="text-white">{rec.expectedImpact}</strong></span>
+                      <span>•</span>
+                      <span>Effort: <strong className="text-white">{rec.difficulty}</strong></span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-[#838383] bg-black/40 px-3.5 py-1.5 rounded-full border border-white/10">
-                    <span>Expected Impact: <strong className="text-white">{rec.expectedImpact}</strong></span>
-                    <span>•</span>
-                    <span>Effort: <strong className="text-white">{rec.difficulty}</strong></span>
+
+                  <h3 className="font-display font-bold text-lg text-white leading-snug">
+                    {rec.title}
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="p-3.5 rounded-2xl bg-red-950/20 border border-red-500/20 space-y-1">
+                      <span className="font-bold text-red-300 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                        <XCircle className="w-3.5 h-3.5 shrink-0" /> Identified Issue
+                      </span>
+                      <p className="text-red-100/90 leading-relaxed">{rec.problem}</p>
+                    </div>
+                    <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-1">
+                      <span className="font-bold text-[#DDF160] uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                        <TrendingUp className="w-3.5 h-3.5 shrink-0" /> Revenue Impact
+                      </span>
+                      <p className="text-[#ACACAC] leading-relaxed">{rec.whyItMatters}</p>
+                    </div>
                   </div>
                 </div>
 
-                <h3 className="font-display font-bold text-lg sm:text-xl text-white">
-                  {rec.title}
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div className="p-4 rounded-2xl bg-red-950/20 border border-red-500/20 space-y-1.5">
-                    <span className="font-bold text-red-300 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
-                      <XCircle className="w-3.5 h-3.5" /> Identified Issue
-                    </span>
-                    <p className="text-red-100/90 leading-relaxed">{rec.problem}</p>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-1.5">
-                    <span className="font-bold text-[#DDF160] uppercase tracking-wider text-[10px] flex items-center gap-1.5">
-                      <TrendingUp className="w-3.5 h-3.5" /> Why It Matters for Revenue
-                    </span>
-                    <p className="text-[#ACACAC] leading-relaxed">{rec.whyItMatters}</p>
-                  </div>
-                </div>
-
-                <div className="p-4 sm:p-5 rounded-2xl bg-[#DDF160]/10 border border-[#DDF160]/30 flex items-start gap-3 text-xs text-white">
+                <div className="p-4 rounded-2xl bg-[#DDF160]/10 border border-[#DDF160]/30 flex items-start gap-3 text-xs text-white">
                   <CheckCircle2 className="w-4 h-4 text-[#DDF160] mt-0.5 shrink-0" />
                   <div className="leading-relaxed">
-                    <strong className="text-[#DDF160] uppercase tracking-wider text-[11px] block mb-0.5">
+                    <strong className="text-[#DDF160] uppercase tracking-wider text-[10px] block mb-0.5">
                       Recommended Implementation Fix
                     </strong>
                     {rec.recommendedAction}
