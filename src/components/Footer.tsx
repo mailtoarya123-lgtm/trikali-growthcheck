@@ -6,8 +6,11 @@ export default function Footer() {
   return (
     <footer className="border-t border-white/[0.08] bg-[#161616] text-[#ACACAC]">
       {/* Huge Trikali wordmark matching trikali.com footer */}
-      <div className="border-b border-white/[0.06] py-12 overflow-hidden text-center select-none">
-        <h2 className="font-display font-extrabold text-[clamp(48px,12vw,160px)] text-white tracking-tighter leading-none flex items-center justify-center gap-4 opacity-90">
+      <div className="border-b border-white/[0.06] py-8 sm:py-12 px-4 overflow-hidden text-center select-none">
+        <a
+          href="https://trikali.com"
+          className="font-display font-extrabold text-[clamp(36px,11vw,160px)] text-white tracking-tighter leading-none inline-flex items-center justify-center gap-2 sm:gap-4 opacity-90 hover:opacity-100 transition-opacity"
+        >
           <Image
             src="/icon-trikali.png"
             alt="Trikali"
@@ -16,19 +19,19 @@ export default function Footer() {
             className="w-[0.7em] h-[0.7em] object-contain inline-block"
           />
           TrikaliDigital
-        </h2>
+        </a>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
           {/* Brand Info */}
-          <div className="md:col-span-2 space-y-4">
-            <Link href="/" className="flex items-center gap-2.5">
+          <div className="sm:col-span-2 space-y-4">
+            <a href="https://trikali.com" className="inline-flex items-center gap-2.5">
               <Image src="/icon-trikali.png" alt="Trikali" width={28} height={28} />
               <span className="font-display font-bold text-xl tracking-tight text-white">
                 Trikali <span className="text-[#DDF160]">GrowthCheck</span>
               </span>
-            </Link>
+            </a>
             <p className="text-xs text-[#838383] max-w-sm leading-relaxed">
               Design-led digital growth studio based in Montreal with engineering roots in Hyderabad. Trikali GrowthCheck is an enterprise AI marketing audit engine engineered to reveal conversion leaks and commercial search opportunities.
             </p>
@@ -70,7 +73,6 @@ export default function Footer() {
                   Services & Retainers <ArrowUpRight className="w-3 h-3 text-[#737373]" />
                 </a>
               </li>
-              <li><Link href="/audit/demo-audit-sample" className="hover:text-white transition-colors">Interactive Sample Report</Link></li>
               <li><Link href="/admin" className="hover:text-white transition-colors">Agency Lead Portal</Link></li>
             </ul>
           </div>

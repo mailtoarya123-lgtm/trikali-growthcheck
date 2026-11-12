@@ -250,7 +250,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                 <div className="space-y-4">
                   {/* Single-Row Top Header: Executive Summary Badge on Left, Action Buttons on Right */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.08]">
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex flex-wrap items-center gap-2.5">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DDF160]/10 text-[#DDF160] text-xs font-bold border border-[#DDF160]/25">
                         <Sparkles className="w-3.5 h-3.5" /> Executive Summary
                       </span>
@@ -259,10 +259,10 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2.5 shrink-0">
+                    <div className="grid grid-cols-2 sm:flex items-center gap-2.5 w-full sm:w-auto shrink-0">
                       <button
                         onClick={handleShare}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/20 bg-white/5 text-xs font-semibold text-white transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160] whitespace-nowrap"
+                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full border border-white/20 bg-white/5 text-xs font-semibold text-white transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160] whitespace-nowrap"
                       >
                         {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
                         {copiedLink ? 'Link Copied' : 'Share Link'}
@@ -271,7 +271,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                       <button
                         onClick={handleDownloadPDF}
                         disabled={isExporting}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] text-xs font-bold transition-colors disabled:opacity-60 whitespace-nowrap"
+                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] text-xs font-bold transition-colors disabled:opacity-60 whitespace-nowrap"
                       >
                         {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
                         {isExporting ? 'Generating PDF...' : 'Download PDF'}
@@ -289,18 +289,18 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                   </div>
 
                   {/* Quick Executive Telemetry Highlight Pills */}
-                  <div className="grid grid-cols-3 gap-3 pt-1">
-                    <div className="p-3 rounded-xl bg-black/35 border border-white/10">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <div className="p-3.5 rounded-xl bg-black/35 border border-white/10">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383] block">Server Response</span>
-                      <span className="font-display text-sm sm:text-base font-bold text-white">{report.measuredData.responseTimeMs}ms TTFB</span>
+                      <span className="font-display text-base font-bold text-white">{report.measuredData.responseTimeMs}ms TTFB</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-black/35 border border-white/10">
+                    <div className="p-3.5 rounded-xl bg-black/35 border border-white/10">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383] block">Critical Leaks</span>
-                      <span className="font-display text-sm sm:text-base font-bold text-red-400">{report.criticalIssues.length} High-Priority</span>
+                      <span className="font-display text-base font-bold text-red-400">{report.criticalIssues.length} High-Priority</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-black/35 border border-white/10">
+                    <div className="p-3.5 rounded-xl bg-black/35 border border-white/10">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383] block">Growth Levers</span>
-                      <span className="font-display text-sm sm:text-base font-bold text-[#DDF160]">{report.recommendations.length} Action Items</span>
+                      <span className="font-display text-base font-bold text-[#DDF160]">{report.recommendations.length} Action Items</span>
                     </div>
                   </div>
                 </div>
@@ -319,7 +319,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                     href="https://trikali.com/contact-page.php"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 shrink-0"
+                    className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 shrink-0"
                   >
                     Book Strategy Call <ArrowUpRight className="w-3.5 h-3.5" />
                   </a>
@@ -440,7 +440,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                 </div>
 
                 {/* Screenshot + Visual Callout Pins & Target Rings */}
-                <div className="relative bg-black/90 h-[380px] sm:h-[440px] overflow-hidden">
+                <div className="relative bg-black/90 h-[250px] sm:h-[440px] overflow-hidden">
                   {report.measuredData.screenshotUrl ? (
                     <img
                       src={report.measuredData.screenshotUrl}
@@ -464,63 +464,63 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                     <div className="absolute inset-0 pointer-events-none">
                       
                       {/* PIN #1: Top-Left Header / H1 Heading Callout */}
-                      <div className="absolute top-4 left-4 flex items-start gap-2.5 max-w-[290px] sm:max-w-[330px]">
-                        <div className="relative flex items-center justify-center shrink-0 mt-1">
-                          <span className={`animate-ping absolute inline-flex h-7 w-7 rounded-full opacity-60 ${hasH1Issue ? 'bg-red-500' : 'bg-[#DDF160]'}`} />
-                          <span className={`relative w-7 h-7 rounded-full font-display font-black text-xs flex items-center justify-center shadow-lg border-2 border-black ${hasH1Issue ? 'bg-red-500 text-white' : 'bg-[#DDF160] text-[#161616]'}`}>
+                      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-start gap-2 sm:gap-2.5 max-w-[200px] sm:max-w-[330px]">
+                        <div className="relative flex items-center justify-center shrink-0 mt-0.5 sm:mt-1">
+                          <span className={`animate-ping absolute inline-flex h-6 w-6 sm:h-7 sm:w-7 rounded-full opacity-60 ${hasH1Issue ? 'bg-red-500' : 'bg-[#DDF160]'}`} />
+                          <span className={`relative w-6 h-6 sm:w-7 sm:h-7 rounded-full font-display font-black text-[11px] sm:text-xs flex items-center justify-center shadow-lg border-2 border-black ${hasH1Issue ? 'bg-red-500 text-white' : 'bg-[#DDF160] text-[#161616]'}`}>
                             1
                           </span>
                         </div>
-                        <div className={`bg-black/90 backdrop-blur-md rounded-xl p-3 border shadow-2xl ${hasH1Issue ? 'border-red-500/60' : 'border-[#DDF160]/60'}`}>
+                        <div className={`bg-black/90 backdrop-blur-md rounded-xl p-2 sm:p-3 border shadow-2xl ${hasH1Issue ? 'border-red-500/60' : 'border-[#DDF160]/60'}`}>
                           <span className={`text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1 ${hasH1Issue ? 'text-red-400' : 'text-[#DDF160]'}`}>
                             <AlertTriangle className="w-3 h-3 shrink-0" />
                             {report.measuredData.h1Tags.length === 0
-                              ? 'Pointing Out: Missing <h1> Tag'
+                              ? 'Missing <h1> Tag'
                               : report.measuredData.h1Tags.some(h => !h.trim())
-                              ? 'Pointing Out: Empty <h1></h1> Tag'
+                              ? 'Empty <h1> Tag'
                               : report.measuredData.h1Tags.length > 1
-                              ? `Pointing Out: ${report.measuredData.h1Tags.length} Duplicate H1s`
-                              : 'Pointing Out: Primary <h1> Headline'}
+                              ? `${report.measuredData.h1Tags.length} Duplicate H1s`
+                              : 'Primary <h1> Headline'}
                           </span>
-                          <p className="text-[11px] text-white font-medium mt-1 line-clamp-2 leading-snug">
+                          <p className="hidden sm:block text-[11px] text-white font-medium mt-1 line-clamp-2 leading-snug">
                             {primaryH1 ? `"${primaryH1}"` : 'Search crawlers see no primary H1 headline text in the hero container.'}
                           </p>
                         </div>
                       </div>
 
                       {/* PIN #2: Top-Right Media & Image Alt Leak Callout */}
-                      <div className="absolute top-4 right-4 hidden sm:flex items-start gap-2.5 max-w-[290px]">
-                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-3 border border-amber-400/60 shadow-2xl text-right">
+                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-start gap-2 sm:gap-2.5 max-w-[160px] sm:max-w-[290px]">
+                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-2 sm:p-3 border border-amber-400/60 shadow-2xl text-right">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center justify-end gap-1">
                             <ImageIcon className="w-3 h-3 shrink-0" />
-                            Pointing Out: {report.measuredData.imagesMissingAlt} Unindexed Images
+                            {report.measuredData.imagesMissingAlt} Unindexed Images
                           </span>
-                          <p className="text-[11px] text-[#ACACAC] mt-1 leading-snug">
+                          <p className="hidden sm:block text-[11px] text-[#ACACAC] mt-1 leading-snug">
                             {report.measuredData.imagesMissingAlt} of {report.measuredData.imagesTotal} page visuals have missing or generic <code className="text-white">alt</code> text ({report.measuredData.pageSizeKb} KB HTML).
                           </p>
                         </div>
-                        <div className="relative flex items-center justify-center shrink-0 mt-1">
-                          <span className="animate-ping absolute inline-flex h-7 w-7 rounded-full bg-amber-400 opacity-60" />
-                          <span className="relative w-7 h-7 rounded-full bg-amber-400 text-[#161616] font-display font-black text-xs flex items-center justify-center shadow-lg border-2 border-black">
+                        <div className="relative flex items-center justify-center shrink-0 mt-0.5 sm:mt-1">
+                          <span className="animate-ping absolute inline-flex h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-amber-400 opacity-60" />
+                          <span className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-400 text-[#161616] font-display font-black text-[11px] sm:text-xs flex items-center justify-center shadow-lg border-2 border-black">
                             2
                           </span>
                         </div>
                       </div>
 
                       {/* PIN #3: Bottom-Left Above-the-Fold CTA & Conversion Zone */}
-                      <div className="absolute bottom-4 left-4 flex items-end gap-2.5 max-w-[320px]">
-                        <div className="relative flex items-center justify-center shrink-0 mb-1">
-                          <span className="animate-ping absolute inline-flex h-7 w-7 rounded-full bg-[#DDF160] opacity-60" />
-                          <span className="relative w-7 h-7 rounded-full bg-[#DDF160] text-[#161616] font-display font-black text-xs flex items-center justify-center shadow-lg border-2 border-black">
+                      <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 flex items-end gap-2 sm:gap-2.5 max-w-[210px] sm:max-w-[320px]">
+                        <div className="relative flex items-center justify-center shrink-0 mb-0.5 sm:mb-1">
+                          <span className="animate-ping absolute inline-flex h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-[#DDF160] opacity-60" />
+                          <span className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#DDF160] text-[#161616] font-display font-black text-[11px] sm:text-xs flex items-center justify-center shadow-lg border-2 border-black">
                             3
                           </span>
                         </div>
-                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-3 border border-[#DDF160]/60 shadow-2xl">
+                        <div className="bg-black/90 backdrop-blur-md rounded-xl p-2 sm:p-3 border border-[#DDF160]/60 shadow-2xl">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#DDF160] flex items-center gap-1">
                             <MousePointerClick className="w-3 h-3 shrink-0" />
-                            Pointing Out: Hero CTA Funnel ({report.measuredData.ctaButtonTexts.length} Buttons)
+                            Hero CTA ({report.measuredData.ctaButtonTexts.length} Buttons)
                           </span>
-                          <p className="text-[11px] text-white mt-1 truncate">
+                          <p className="hidden sm:block text-[11px] text-white mt-1 truncate">
                             {report.measuredData.ctaButtonTexts.length > 0
                               ? `Detected: ${report.measuredData.ctaButtonTexts.slice(0, 3).map(c => `"${c}"`).join(', ')}`
                               : 'No high-contrast primary conversion button detected above fold'}
@@ -529,7 +529,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                       </div>
 
                       {/* PIN #4: Bottom-Right Pixel & Schema Telemetry */}
-                      <div className="absolute bottom-4 right-4 hidden md:flex items-end gap-2.5 max-w-[290px]">
+                      <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 hidden md:flex items-end gap-2.5 max-w-[290px]">
                         <div className="bg-black/90 backdrop-blur-md rounded-xl p-3 border border-white/30 shadow-2xl text-right">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-white flex items-center justify-end gap-1">
                             <Activity className="w-3 h-3 text-[#DDF160] shrink-0" />
@@ -1343,18 +1343,18 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
               Trikali has grown organic search pipeline and digital conversion rates for SMB and high-growth organizations worldwide. Let our senior marketing and engineering team implement these high-priority fixes.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto shrink-0">
             <a
               href="https://trikali.com/contact-page.php"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-3.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] font-bold text-xs transition-colors flex items-center gap-1.5"
+              className="w-full sm:w-auto justify-center px-8 py-3.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] font-bold text-xs transition-colors flex items-center gap-1.5"
             >
               Say Hello <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
             <Link
               href="/"
-              className="px-6 py-3.5 rounded-full border border-white/20 text-white font-semibold text-xs transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160]"
+              className="w-full sm:w-auto text-center px-6 py-3.5 rounded-full border border-white/20 text-white font-semibold text-xs transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160]"
             >
               Audit Another Website
             </Link>

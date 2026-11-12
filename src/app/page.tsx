@@ -77,29 +77,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Live Sample Preview Strip */}
-      <section className="py-8 bg-black/60 border-b border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#DDF160] text-[#161616] flex items-center justify-center shrink-0 font-bold">
-              <BarChart3 className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="font-display font-bold text-sm text-white">Curious what your audit report looks like?</p>
-              <p className="text-xs text-[#838383]">Explore an interactive sample audit generated with real measured performance metrics.</p>
-            </div>
-          </div>
-          <Link
-            href="/audit/demo-audit-sample"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-white/20 text-white text-xs font-semibold transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160] whitespace-nowrap"
-          >
-            View Sample Audit Report <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-      </section>
-
       {/* How it works */}
-      <section id="how-it-works" className="py-24 bg-[#161616]">
+      <section id="how-it-works" className="py-16 sm:py-24 bg-[#161616]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
             <h2 className="text-xs font-bold text-[#DDF160] uppercase tracking-widest">Process</h2>
