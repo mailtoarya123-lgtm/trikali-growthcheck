@@ -23,6 +23,7 @@ const GOAL_PILLS: { id: AuditGoal; label: string }[] = [
 export default function MultiStepAuditForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
   const [loadingStatus, setLoadingStatus] = useState<string>('Initializing inspection engine...');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -63,6 +64,7 @@ export default function MultiStepAuditForm() {
       .replace(/\b\w/g, (c) => c.toUpperCase()) || 'Brand';
 
     setIsLoading(true);
+    setProgress(2);
 
     const stages = [
       'Establishing secure SSL connection to target domain...',
@@ -79,7 +81,18 @@ export default function MultiStepAuditForm() {
       if (stageIdx < stages.length) {
         setLoadingStatus(stages[stageIdx]);
       }
-    }, 1400);
+    }, 1500);
+
+    // Smooth adaptive 0 -> 99% progress ticker so even slow internet connections never feel frozen
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev < 45) return prev + 3;
+        if (prev < 75) return prev + 2;
+        if (prev < 92) return prev + 1;
+        if (prev < 99) return prev + 0.5;
+        return 99;
+      });
+    }, 240);
 
     try {
       const res = await fetch('/api/audit', {
@@ -100,11 +113,17 @@ export default function MultiStepAuditForm() {
       });
 
       clearInterval(interval);
+      clearInterval(progressInterval);
       const data = await res.json();
 
       if (!res.ok) {
         throw new Error(data.error || 'Failed to complete audit inspection.');
       }
+
+      setProgress(100);
+      setLoadingStatus('Audit complete! Launching executive dashboard...');
+
+      await new Promise((resolve) => setTimeout(resolve, 350));
 
       if (typeof window !== 'undefined') {
         window.location.href = `/audit/${data.auditId}`;
@@ -113,7 +132,9 @@ export default function MultiStepAuditForm() {
       }
     } catch (err: unknown) {
       clearInterval(interval);
+      clearInterval(progressInterval);
       setIsLoading(false);
+      setProgress(0);
       setErrorMessage(err instanceof Error ? err.message : 'An error occurred during audit generation.');
     }
   };
@@ -129,25 +150,78 @@ export default function MultiStepAuditForm() {
         )}
 
         {isLoading ? (
-          <div className="py-12 flex flex-col items-center justify-center text-center space-y-6">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full border-2 border-white/10 border-t-[#DDF160] animate-spin flex items-center justify-center" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Loader2 className="w-6 h-6 text-[#DDF160] animate-pulse" />
+          <div className="py-10 sm:py-12 flex flex-col items-center justify-center text-center space-y-6">
+            {/* Progressive 0% -> 100% Circular Gauge */}
+            <div className="relative w-28 h-28 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.08)"
+                  strokeWidth="7"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="#DDF160"
+                  strokeWidth="7"
+                  strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 42}
+                  strokeDashoffset={2 * Math.PI * 42 * (1 - Math.min(100, Math.round(progress)) / 100)}
+                  className="transition-all duration-300 ease-out"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="font-display text-2xl font-extrabold text-white leading-none">
+                  {Math.min(100, Math.round(progress))}%
+                </span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#DDF160] mt-1">
+                  Scanning
+                </span>
               </div>
             </div>
+
             <div>
               <h3 className="font-display text-xl font-bold text-white tracking-tight">
                 Auditing {websiteUrl.replace(/^https?:\/\//i, '')}
               </h3>
-              <p className="text-xs text-[#ACACAC] mt-1.5 max-w-sm transition-all animate-pulse">
+              <p className="text-xs text-[#ACACAC] mt-1.5 max-w-sm mx-auto transition-all">
                 {loadingStatus}
               </p>
             </div>
-            <div className="w-full max-w-md bg-white/5 rounded-full h-1.5 overflow-hidden mt-4 border border-white/10">
-              <div className="bg-[#DDF160] h-full rounded-full animate-pulse w-3/4" />
+
+            {/* Horizontal 0% -> 100% Progress Bar + Step Checklist */}
+            <div className="w-full max-w-md space-y-2.5">
+              <div className="flex items-center justify-between text-[11px] font-mono">
+                <span className="text-[#ACACAC]">Live Diagnostic Telemetry</span>
+                <span className="text-[#DDF160] font-bold">{Math.min(100, Math.round(progress))}% / 100%</span>
+              </div>
+              <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden border border-white/10">
+                <div
+                  className="bg-[#DDF160] h-full rounded-full transition-all duration-300 ease-out"
+                  style={{ width: `${Math.min(100, Math.round(progress))}%` }}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-2 pt-2 text-[10px] font-semibold">
+                <div className={`px-2.5 py-1.5 rounded-xl border transition-colors ${progress >= 20 ? 'bg-[#DDF160]/10 border-[#DDF160]/30 text-[#DDF160]' : 'bg-black/30 border-white/5 text-[#737373]'}`}>
+                  {progress >= 35 ? '✓ DOM & SEO' : '• DOM & SEO'}
+                </div>
+                <div className={`px-2.5 py-1.5 rounded-xl border transition-colors ${progress >= 45 ? 'bg-[#DDF160]/10 border-[#DDF160]/30 text-[#DDF160]' : 'bg-black/30 border-white/5 text-[#737373]'}`}>
+                  {progress >= 70 ? '✓ Screenshots' : '• Screenshots'}
+                </div>
+                <div className={`px-2.5 py-1.5 rounded-xl border transition-colors ${progress >= 75 ? 'bg-[#DDF160]/10 border-[#DDF160]/30 text-[#DDF160]' : 'bg-black/30 border-white/5 text-[#737373]'}`}>
+                  {progress >= 100 ? '✓ AI Roadmap' : '• AI Roadmap'}
+                </div>
+              </div>
             </div>
-            <p className="text-[11px] text-[#737373]">Live technical audit in progress. Please wait ~10 seconds.</p>
+
+            <p className="text-[11px] text-[#737373]">
+              Real-time inspection in progress — adapts automatically to your connection speed.
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
