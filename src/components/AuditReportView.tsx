@@ -222,7 +222,6 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                         2 * Math.PI * 66 * (1 - Math.min(100, Math.max(0, report.scores.overall)) / 100)
                       }
                       style={{
-                        filter: `drop-shadow(0 0 10px ${getScoreStrokeHex(report.scores.overall)}45)`,
                         transition: 'stroke-dashoffset 0.8s ease-out',
                       }}
                     />
@@ -247,40 +246,32 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
               </div>
 
               {/* Right Executive Summary (8 cols) */}
-              <div className="lg:col-span-8 flex flex-col justify-between space-y-5">
+              <div className="lg:col-span-8 flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
-                  {/* Top Bar Inside Card: Executive Pill + Website Link on Left, Share & Download PDF on Right */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
-                    <div className="flex flex-wrap items-center gap-2.5">
+                  {/* Single-Row Top Header: Executive Summary Badge on Left, Action Buttons on Right */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.08]">
+                    <div className="flex items-center gap-2.5">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DDF160]/10 text-[#DDF160] text-xs font-bold border border-[#DDF160]/25">
                         <Sparkles className="w-3.5 h-3.5" /> Executive Summary
                       </span>
-                      <a
-                        href={report.websiteUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-[#DDF160] font-semibold transition-all"
-                      >
-                        {cleanDomain} <ArrowUpRight className="w-3 h-3" />
-                      </a>
                       <span className="text-xs text-[#838383]">
                         {report.industry} • {new Date(report.createdAt).toLocaleDateString()}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2.5 shrink-0">
                       <button
                         onClick={handleShare}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition-all whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/20 bg-white/5 text-xs font-semibold text-white transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160] whitespace-nowrap"
                       >
-                        {copiedLink ? <Check className="w-3.5 h-3.5 text-[#DDF160]" /> : <Share2 className="w-3.5 h-3.5" />}
+                        {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
                         {copiedLink ? 'Link Copied' : 'Share Link'}
                       </button>
 
                       <button
                         onClick={handleDownloadPDF}
                         disabled={isExporting}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold shadow-md transition-all disabled:opacity-60 whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] text-xs font-bold transition-colors disabled:opacity-60 whitespace-nowrap"
                       >
                         {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
                         {isExporting ? 'Generating PDF...' : 'Download PDF'}
@@ -288,16 +279,34 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                     </div>
                   </div>
 
-                  <h1 className="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-                    Audit Findings for {report.businessName}
-                  </h1>
-                  <p className="text-sm text-[#ACACAC] leading-relaxed">
-                    {report.executiveSummary}
-                  </p>
+                  <div className="space-y-2.5">
+                    <h1 className="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                      Audit Findings for {report.businessName}
+                    </h1>
+                    <p className="text-sm text-[#ACACAC] leading-relaxed">
+                      {report.executiveSummary}
+                    </p>
+                  </div>
+
+                  {/* Quick Executive Telemetry Highlight Pills */}
+                  <div className="grid grid-cols-3 gap-3 pt-1">
+                    <div className="p-3 rounded-xl bg-black/35 border border-white/10">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383] block">Server Response</span>
+                      <span className="font-display text-sm sm:text-base font-bold text-white">{report.measuredData.responseTimeMs}ms TTFB</span>
+                    </div>
+                    <div className="p-3 rounded-xl bg-black/35 border border-white/10">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383] block">Critical Leaks</span>
+                      <span className="font-display text-sm sm:text-base font-bold text-red-400">{report.criticalIssues.length} High-Priority</span>
+                    </div>
+                    <div className="p-3 rounded-xl bg-black/35 border border-white/10">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#838383] block">Growth Levers</span>
+                      <span className="font-display text-sm sm:text-base font-bold text-[#DDF160]">{report.recommendations.length} Action Items</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Agency Partner Callout */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-black/60 via-black/40 to-[#DDF160]/10 border border-white/10">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-black/40 border border-white/10">
                   <div className="space-y-0.5">
                     <p className="text-xs sm:text-sm font-bold text-white">
                       Want Trikali Studio to implement this entire roadmap for you?
@@ -310,7 +319,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                     href="https://trikali.com/contact-page.php"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shadow-lg shadow-[#DDF160]/10 shrink-0"
+                    className="px-5 py-2.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 shrink-0"
                   >
                     Book Strategy Call <ArrowUpRight className="w-3.5 h-3.5" />
                   </a>
@@ -384,10 +393,10 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
             <button
               type="button"
               onClick={() => setShowPointers(!showPointers)}
-              className={`self-start sm:self-auto px-4 py-2 rounded-full text-xs font-bold border transition-all flex items-center gap-2 ${
+              className={`self-start sm:self-auto px-4 py-2 rounded-full text-xs font-bold border transition-colors flex items-center gap-2 ${
                 showPointers
-                  ? 'bg-[#DDF160] text-[#161616] border-[#DDF160]'
-                  : 'bg-white/5 text-white border-white/20 hover:border-white'
+                  ? 'bg-[#DDF160] hover:bg-white text-[#161616] border-[#DDF160] hover:border-white'
+                  : 'bg-white/5 text-white border-white/20 hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160]'
               }`}
             >
               <Crosshair className="w-3.5 h-3.5" />
@@ -930,7 +939,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                         <button
                           type="button"
                           onClick={() => handleCopyText(suggestedAltText, copyId)}
-                          className="px-3 py-1.5 rounded-lg bg-black/60 hover:bg-black text-[10px] font-bold text-[#DDF160] border border-[#DDF160]/30 shrink-0 flex items-center gap-1 transition-all"
+                          className="px-3 py-1.5 rounded-lg bg-black/60 hover:bg-[#DDF160] text-[10px] font-bold text-[#DDF160] hover:text-[#161616] border border-[#DDF160]/30 hover:border-[#DDF160] shrink-0 flex items-center gap-1 transition-colors"
                         >
                           {copiedSnippet === copyId ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                           {copiedSnippet === copyId ? 'Copied' : 'Copy'}
@@ -1339,13 +1348,13 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
               href="https://trikali.com/contact-page.php"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-3.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] font-bold text-xs shadow-lg transition-all flex items-center gap-1.5"
+              className="px-8 py-3.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] font-bold text-xs transition-colors flex items-center gap-1.5"
             >
               Say Hello <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
             <Link
               href="/"
-              className="px-6 py-3.5 rounded-full border border-white/20 hover:border-white text-white font-semibold text-xs transition-all hover:bg-white/5"
+              className="px-6 py-3.5 rounded-full border border-white/20 text-white font-semibold text-xs transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160]"
             >
               Audit Another Website
             </Link>

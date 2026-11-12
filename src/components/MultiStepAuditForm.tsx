@@ -441,7 +441,7 @@ export default function MultiStepAuditForm() {
                 <button
                   type="button"
                   onClick={handlePrev}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 text-white hover:bg-white hover:text-black text-xs font-semibold transition-all"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 text-white hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160] text-xs font-semibold transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
@@ -453,7 +453,7 @@ export default function MultiStepAuditForm() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-white hover:bg-[#DDF160] text-[#161616] text-xs font-bold transition-all shadow-md"
+                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-white hover:bg-[#DDF160] text-[#161616] text-xs font-bold transition-colors"
                 >
                   Continue <ArrowRight className="w-4 h-4" />
                 </button>
@@ -461,7 +461,7 @@ export default function MultiStepAuditForm() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold transition-all shadow-lg shadow-[#DDF160]/20"
+                  className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] text-xs font-bold transition-colors"
                 >
                   {isLoading ? (
                     <>

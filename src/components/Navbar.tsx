@@ -29,7 +29,7 @@ export default function Navbar() {
           </a>
           <Link
             href="/"
-            className="font-display text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] tracking-wider uppercase transition-all"
+            className="font-display text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] tracking-wider uppercase transition-colors"
             title="GrowthCheck Home"
           >
             GrowthCheck
@@ -38,17 +38,17 @@ export default function Navbar() {
 
         {/* Center Navigation Links (Removed Studio) */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#ACACAC]">
-          <Link href="/#how-it-works" className="hover:text-white transition-colors">
+          <Link href="/#how-it-works" className="hover:text-[#DDF160] transition-colors">
             How It Works
           </Link>
-          <Link href="/#what-we-check" className="hover:text-white transition-colors">
+          <Link href="/#what-we-check" className="hover:text-[#DDF160] transition-colors">
             Audit Scope
           </Link>
-          <Link href="/audit/demo-audit-sample" className="flex items-center gap-1.5 hover:text-white transition-colors text-[#DDF160]">
+          <Link href="/audit/demo-audit-sample" className="flex items-center gap-1.5 text-[#DDF160] hover:text-white transition-colors">
             <Sparkles className="w-3.5 h-3.5" />
             Live Demo
           </Link>
-          <Link href="/admin" className="flex items-center gap-1.5 hover:text-white transition-colors text-[#838383]">
+          <Link href="/admin" className="flex items-center gap-1.5 text-[#838383] hover:text-white transition-colors">
             <ShieldCheck className="w-3.5 h-3.5" />
             Admin
           </Link>
@@ -60,13 +60,13 @@ export default function Navbar() {
             href="https://trikali.com/contact-page.php"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 hover:border-white text-xs font-semibold text-white transition-all hover:bg-white hover:text-black"
+            className="hidden sm:inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 text-xs font-semibold text-white transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160]"
           >
             Say Hello <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
           <Link
             href="/#audit-form"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] text-xs font-bold transition-all shadow-lg shadow-[#DDF160]/10 hover:shadow-[#DDF160]/25"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] text-xs font-bold transition-colors"
           >
             <BarChart2 className="w-3.5 h-3.5" />
             Free Audit

@@ -43,14 +43,14 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <a
                 href="#audit-form"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] font-bold text-sm shadow-xl shadow-[#DDF160]/15 transition-all hover:scale-[1.02]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] font-bold text-sm transition-colors"
               >
                 Get My Free Marketing Audit
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#how-it-works"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-white/20 hover:border-white text-white font-semibold text-sm transition-all hover:bg-white/5"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-white/20 text-white font-semibold text-sm transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160]"
               >
                 See How It Works
               </a>
@@ -91,7 +91,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/audit/demo-audit-sample"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-white/20 hover:border-white text-white text-xs font-semibold transition-all hover:bg-white hover:text-black whitespace-nowrap"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-white/20 text-white text-xs font-semibold transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160] whitespace-nowrap"
           >
             View Sample Audit Report <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -247,13 +247,13 @@ export default function HomePage() {
                   href="https://trikali.com/contact-page.php"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white hover:bg-[#DDF160] text-[#161616] font-bold text-xs transition-all shadow-md"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white hover:bg-[#DDF160] text-[#161616] font-bold text-xs transition-colors"
                 >
                   Say Hello <ArrowUpRight className="w-3.5 h-3.5" />
                 </a>
                 <a
                   href="#audit-form"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-white/20 hover:border-white text-white font-semibold text-xs transition-all hover:bg-white/5"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-white/20 text-white font-semibold text-xs transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160]"
                 >
                   Run Your Free Audit First
                 </a>
@@ -351,7 +351,7 @@ export default function HomePage() {
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="#audit-form"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-9 py-3.5 rounded-full bg-[#DDF160] hover:bg-[#c7db4a] text-[#161616] font-bold text-xs shadow-xl shadow-[#DDF160]/20 transition-all hover:scale-[1.02]"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-9 py-3.5 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] font-bold text-xs transition-colors"
             >
               Start Free Audit Now
               <ArrowRight className="w-4 h-4" />
@@ -360,7 +360,7 @@ export default function HomePage() {
               href="https://trikali.com/contact-page.php"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-white/20 hover:border-white text-white font-semibold text-xs transition-all hover:bg-white/5"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-white/20 text-white font-semibold text-xs transition-colors hover:bg-[#DDF160] hover:text-[#161616] hover:border-[#DDF160]"
             >
               Say Hello <ArrowUpRight className="w-4 h-4" />
             </a>
