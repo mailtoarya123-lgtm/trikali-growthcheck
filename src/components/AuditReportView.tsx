@@ -38,6 +38,7 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
   const [showPointers, setShowPointers] = useState(true);
+  const [expandedPillar, setExpandedPillar] = useState<string | null>(null);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-[#DDF160] border-[#DDF160] bg-[#DDF160]/10';
@@ -338,13 +339,23 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-start">
                 {pillarCards.map((pillar) => {
                   const Icon = pillar.icon;
+                  const isExpanded = expandedPillar === pillar.key;
+                  const isLongText = (pillar.summary?.length || 0) > 155;
+
                   return (
                     <div
                       key={pillar.key}
-                      className="p-5 rounded-2xl bg-black/35 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-start space-y-3.5"
+                      onClick={() => isLongText && setExpandedPillar(isExpanded ? null : pillar.key)}
+                      className={`p-5 rounded-2xl bg-black/35 border transition-all flex flex-col justify-between space-y-3.5 ${
+                        isLongText ? 'cursor-pointer' : ''
+                      } ${
+                        isExpanded
+                          ? 'border-[#DDF160]/50 bg-black/60'
+                          : 'border-white/10 hover:border-white/25 min-h-[215px]'
+                      }`}
                     >
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -361,10 +372,23 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                             style={{ width: `${Math.min(100, Math.max(5, pillar.score))}%` }}
                           />
                         </div>
+                        <p className={`text-[11px] text-[#ACACAC] leading-relaxed ${isExpanded ? '' : 'line-clamp-4'}`}>
+                          {pillar.summary}
+                        </p>
                       </div>
-                      <p className="text-[11px] text-[#ACACAC] leading-relaxed line-clamp-5">
-                        {pillar.summary}
-                      </p>
+
+                      {isLongText && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedPillar(isExpanded ? null : pillar.key);
+                          }}
+                          className="text-[10px] font-bold text-[#DDF160] hover:text-white transition-colors self-start flex items-center gap-1 pt-0.5"
+                        >
+                          {isExpanded ? 'Show less ↑' : 'Read full insight ↓'}
+                        </button>
+                      )}
                     </div>
                   );
                 })}
