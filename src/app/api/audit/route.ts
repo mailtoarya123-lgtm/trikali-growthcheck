@@ -28,25 +28,30 @@ export async function POST(req: NextRequest) {
     if (!workEmail || !workEmail.includes('@')) {
       return NextResponse.json({ error: 'A valid work email is required.' }, { status: 400 });
     }
-    if (!businessName) {
-      return NextResponse.json({ error: 'Business name is required.' }, { status: 400 });
-    }
 
     const safeUrlCheck = validateSafeUrl(websiteUrl);
     if (!safeUrlCheck.valid || !safeUrlCheck.normalizedUrl) {
       return NextResponse.json({ error: safeUrlCheck.error || 'Invalid or prohibited website URL.' }, { status: 400 });
     }
 
+    // Auto-derive business name from domain if not explicitly provided
+    const parsedHost = new URL(safeUrlCheck.normalizedUrl).hostname.replace(/^www\./i, '');
+    const derivedBrand = parsedHost
+      .split('.')[0]
+      .replace(/[-_]+/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+    const finalBusinessName = (businessName && businessName.trim()) ? businessName.trim() : derivedBrand;
+
     const formData: AuditFormData = {
       websiteUrl: safeUrlCheck.normalizedUrl,
-      businessName: businessName.trim(),
+      businessName: finalBusinessName,
       industry: industry || 'General Business',
       country: country || 'Global',
       targetAudience: targetAudience || 'Potential Customers',
-      goals: Array.isArray(goals) && goals.length > 0 ? goals : ['leads', 'seo'],
-      contactName: contactName || 'Business Owner',
+      goals: Array.isArray(goals) && goals.length > 0 ? goals : ['leads', 'seo', 'cro'],
+      contactName: contactName || workEmail.split('@')[0],
       workEmail: workEmail.trim().toLowerCase(),
-      companyName: companyName || businessName,
+      companyName: companyName || finalBusinessName,
       consent: Boolean(consent),
     };
 
