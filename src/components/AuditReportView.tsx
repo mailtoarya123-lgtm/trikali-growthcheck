@@ -339,23 +339,15 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-start">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
                 {pillarCards.map((pillar) => {
                   const Icon = pillar.icon;
-                  const isExpanded = expandedPillar === pillar.key;
-                  const isLongText = (pillar.summary?.length || 0) > 155;
 
                   return (
                     <div
                       key={pillar.key}
-                      onClick={() => isLongText && setExpandedPillar(isExpanded ? null : pillar.key)}
-                      className={`p-5 rounded-2xl bg-black/35 border transition-all flex flex-col justify-between space-y-3.5 ${
-                        isLongText ? 'cursor-pointer' : ''
-                      } ${
-                        isExpanded
-                          ? 'border-[#DDF160]/50 bg-black/60'
-                          : 'border-white/10 hover:border-white/25 min-h-[215px]'
-                      }`}
+                      onClick={() => setExpandedPillar(pillar.key)}
+                      className="p-5 rounded-2xl bg-black/35 border border-white/10 hover:border-[#DDF160]/50 transition-all flex flex-col justify-between space-y-3.5 cursor-pointer group h-[215px]"
                     >
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -372,27 +364,104 @@ export default function AuditReportView({ report }: { report: AuditReport }) {
                             style={{ width: `${Math.min(100, Math.max(5, pillar.score))}%` }}
                           />
                         </div>
-                        <p className={`text-[11px] text-[#ACACAC] leading-relaxed ${isExpanded ? '' : 'line-clamp-4'}`}>
+                        <p className="text-[11px] text-[#ACACAC] leading-relaxed line-clamp-4">
                           {pillar.summary}
                         </p>
                       </div>
 
-                      {isLongText && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedPillar(isExpanded ? null : pillar.key);
-                          }}
-                          className="text-[10px] font-bold text-[#DDF160] hover:text-white transition-colors self-start flex items-center gap-1 pt-0.5"
-                        >
-                          {isExpanded ? 'Show less ↑' : 'Read full insight ↓'}
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedPillar(pillar.key);
+                        }}
+                        className="text-[10px] font-bold text-[#DDF160] group-hover:text-white transition-colors self-start flex items-center gap-1 pt-0.5"
+                      >
+                        Read full insight <ArrowUpRight className="w-3 h-3" />
+                      </button>
                     </div>
                   );
                 })}
               </div>
+
+              {/* Pillar Full Insight Pop-Up Modal */}
+              {expandedPillar && (() => {
+                const activePillar = pillarCards.find((p) => p.key === expandedPillar);
+                if (!activePillar) return null;
+                const ActiveIcon = activePillar.icon;
+                return (
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+                    onClick={() => setExpandedPillar(null)}
+                  >
+                    <div
+                      className="w-full max-w-lg rounded-[2rem] bg-[#1C1C1C] border border-white/15 p-6 sm:p-8 shadow-2xl space-y-5 relative"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex items-center justify-between gap-4 pb-4 border-b border-white/10">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#DDF160]/10 border border-[#DDF160]/30 flex items-center justify-center text-[#DDF160]">
+                            <ActiveIcon className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#DDF160] block">
+                              Pillar Diagnostic Insight
+                            </span>
+                            <h4 className="font-display text-lg font-extrabold text-white">
+                              {activePillar.label}
+                            </h4>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="font-display text-3xl font-black text-white">
+                            {activePillar.score}<span className="text-xs text-[#737373] font-normal">/100</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${getScoreBarColor(activePillar.score)}`}
+                          style={{ width: `${Math.min(100, Math.max(5, activePillar.score))}%` }}
+                        />
+                      </div>
+
+                      <p className="text-sm text-[#E5E5E5] leading-relaxed">
+                        {activePillar.summary}
+                      </p>
+
+                      <div className="pt-2 flex items-center justify-between gap-3">
+                        {/* Quick Prev / Next Pillar Switcher inside Pop-Up */}
+                        <div className="flex items-center gap-1.5">
+                          {pillarCards.map((p) => (
+                            <button
+                              key={p.key}
+                              type="button"
+                              onClick={() => setExpandedPillar(p.key)}
+                              className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition-colors ${
+                                p.key === activePillar.key
+                                  ? 'bg-[#DDF160] text-[#161616] border-[#DDF160]'
+                                  : 'bg-white/5 text-[#ACACAC] border-white/10 hover:border-white/30 hover:text-white'
+                              }`}
+                            >
+                              {p.label.split(' ')[0]}
+                            </button>
+                          ))}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setExpandedPillar(null)}
+                          className="px-5 py-2 rounded-full bg-[#DDF160] hover:bg-white text-[#161616] text-xs font-bold transition-colors"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </section>
